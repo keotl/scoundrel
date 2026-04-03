@@ -1,0 +1,8 @@
+#!/bin/bash
+rsync -av --no-perms --inplace \
+  --exclude='.*' \
+  --exclude='compile_flags.txt' \
+  --exclude='compile_commands.json' \
+  --exclude='*.sh' \
+  --exclude='MIPS*' \
+  "/run/user/1004/gvfs/smb-share:server=192.168.122.102,share=shareddocs/Documents/Scoundrel/" ./
