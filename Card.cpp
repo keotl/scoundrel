@@ -1,0 +1,27 @@
+// Card.cpp: implementation of the Card class.
+//
+//////////////////////////////////////////////////////////////////////
+
+#include "stdafx.h"
+#include "Scoundrel.h"
+#include "Card.h"
+
+#ifdef _DEBUG
+#undef THIS_FILE
+static char THIS_FILE[]=__FILE__;
+#define new DEBUG_NEW
+#endif
+
+//////////////////////////////////////////////////////////////////////
+// Construction/Destruction
+//////////////////////////////////////////////////////////////////////
+
+Card::Card(int rank, CardSuit suit)
+{
+
+}
+
+Card::~Card()
+{
+
+}

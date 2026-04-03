@@ -1,0 +1,40 @@
+; CLW file contains information for the MFC ClassWizard
+
+[General Info]
+Version=1
+LastClass=CScoundrelDlg
+LastTemplate=CDialog
+NewFileInclude1=#include "stdafx.h"
+NewFileInclude2=#include "Scoundrel.h"
+
+ClassCount=2
+Class1=CScoundrelApp
+Class2=CScoundrelDlg
+
+ResourceCount=2
+Resource1=IDR_MAINFRAME
+Resource2=IDD_SCOUNDREL_DIALOG
+
+[CLS:CScoundrelApp]
+Type=0
+HeaderFile=Scoundrel.h
+ImplementationFile=Scoundrel.cpp
+Filter=D
+BaseClass=CWinApp
+VirtualFilter=AC
+
+[CLS:CScoundrelDlg]
+Type=0
+HeaderFile=ScoundrelDlg.h
+ImplementationFile=ScoundrelDlg.cpp
+Filter=D
+BaseClass=CDialog
+VirtualFilter=dWC
+LastObject=CScoundrelDlg
+
+
+[DLG:IDD_SCOUNDREL_DIALOG]
+Type=1
+Class=CScoundrelDlg
+ControlCount=0
+

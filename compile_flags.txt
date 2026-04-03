@@ -1,0 +1,25 @@
+-xc++
+-std=c++98
+-DUNICODE
+-D_UNICODE
+-DUNDER_CE=300
+-D_WIN32_WCE=300
+-D_AFXDLL
+-DMIPS
+-D_MIPS_
+-DWIN32
+-D_WIN32
+-I.
+-I../wce-sdk/wce300/MS Pocket PC/include
+-I../wce-sdk/wce300/MS Pocket PC/mfc/include
+-I../wce-sdk/wce300/MS Pocket PC/atl/include
+-I../Microsoft eMbedded Tools/EVC/Include
+-I../Microsoft eMbedded Tools/EVC/Include/ObjModel
+-I../Microsoft eMbedded Tools/EVC/Include/Win32
+-ferror-limit=0
+-Wno-pragma-once-outside-header
+-Wno-unknown-pragmas
+-Wno-microsoft-include
+-fms-extensions
+-fms-compatibility
+-fdelayed-template-parsing
