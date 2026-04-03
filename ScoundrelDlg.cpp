@@ -1,6 +1,7 @@
 // ScoundrelDlg.cpp : implementation file
 //
 
+#include "Card.h"
 #include "stdafx.h"
 #include "Scoundrel.h"
 #include "ScoundrelDlg.h"
@@ -55,7 +56,8 @@ BOOL CScoundrelDlg::OnInitDialog()
 	CenterWindow(GetDesktopWindow()); // center to the hpc screen
 
 	// TODO: Add extra initialization here
-	// this->drawUtils = DrawUtils();
+	CClientDC dc(this);
+	this->drawUtils.Init(&dc);
 
 	return TRUE; // return TRUE  unless you set the focus to a control
 }
@@ -76,7 +78,8 @@ void CScoundrelDlg::OnPaint()
 	dc.DrawText(msg, &clientRect, 0);
 
 	// Example card for testing
-	this->drawUtils.DrawCardAtPoint(CPoint(100, 100), &dc);
+	Card card(3, HEART);
+	this->drawUtils.DrawCardAtPoint(CPoint(100, 100), card, &dc);
 
 	// Do not call CDialog::OnPaint() for painting messages
 }
@@ -86,7 +89,8 @@ void CScoundrelDlg::OnLButtonDown(UINT nFlags, CPoint point)
 	// TODO: Add your message handler code here and/or call default
 	CClientDC dc(this);
 
-	this->drawUtils.DrawCardAtPoint(point, &dc);
+	Card card(3, HEART);
+	this->drawUtils.DrawCardAtPoint(point, card, &dc);
 
 	CDialog::OnLButtonDown(nFlags, point);
 }

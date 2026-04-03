@@ -9,19 +9,21 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-enum CardSuit {
- SPADE = 0,
-DIAMOND = 1,
-  HEART = 2,
-  CLUB = 3
+enum CardSuit
+{
+	SPADE = 0,
+	DIAMOND = 1,
+	HEART = 2,
+	CLUB = 3
 };
 
-class Card  
+class Card
 {
-public:
-	Card(int rank, CardSuit suit );
-	virtual ~Card();
-
+  public:
+	Card(int rank, CardSuit suit);
+	~Card();
+	int rank;
+	CardSuit suit;
 };
 
 #endif // !defined(AFX_CARD_H__C31D4891_8D2D_4287_BFC0_0E5EAA6C3B4E__INCLUDED_)

@@ -17,8 +17,8 @@ static char THIS_FILE[]=__FILE__;
 //////////////////////////////////////////////////////////////////////
 
 Card::Card(int rank, CardSuit suit)
+	: rank(rank), suit(suit)
 {
-
 }
 
 Card::~Card()
