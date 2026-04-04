@@ -38,6 +38,8 @@ BEGIN_MESSAGE_MAP(CScoundrelDlg, CDialog)
 	//{{AFX_MSG_MAP(CScoundrelDlg)
 	ON_WM_PAINT()
 	ON_WM_LBUTTONDOWN()
+	ON_WM_MOUSEMOVE()
+	ON_WM_LBUTTONDBLCLK()
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -58,28 +60,28 @@ BOOL CScoundrelDlg::OnInitDialog()
 	// TODO: Add extra initialization here
 	CClientDC dc(this);
 	this->drawUtils.Init(&dc);
+	this->game.InitializeNewGame();
+	this->draggingCardIndex = -1;
 
 	return TRUE; // return TRUE  unless you set the focus to a control
 }
 
-static int counter;
 void CScoundrelDlg::OnPaint()
 {
-	counter++;
-	CPaintDC dc(this); // device context for painting
+	CPaintDC dc(this);
 	CRect clientRect;
 	GetClientRect(&clientRect);
 	CBrush brush;
+
+	// Draw background
 	brush.CreateSolidBrush(RGB(0, 130, 0));
 	dc.FillRect(&clientRect, &brush);
 
-	CString msg;
-	msg.Format(_T("Hello from onPaint, counter=%d"), counter);
-	dc.DrawText(msg, &clientRect, 0);
+	// Draw room
 
-	// Example card for testing
-	Card card(3, HEART);
-	this->drawUtils.DrawCardAtPoint(CPoint(100, 100), card, &dc);
+	// Draw Weapon + durability
+
+	// Draw discarded
 
 	// Do not call CDialog::OnPaint() for painting messages
 }
@@ -93,4 +95,18 @@ void CScoundrelDlg::OnLButtonDown(UINT nFlags, CPoint point)
 	this->drawUtils.DrawCardAtPoint(point, card, &dc);
 
 	CDialog::OnLButtonDown(nFlags, point);
+}
+
+void CScoundrelDlg::OnMouseMove(UINT nFlags, CPoint point)
+{
+	// TODO: Add your message handler code here and/or call default
+
+	CDialog::OnMouseMove(nFlags, point);
+}
+
+void CScoundrelDlg::OnLButtonDblClk(UINT nFlags, CPoint point)
+{
+	// TODO: Add your message handler code here and/or call default
+
+	CDialog::OnLButtonDblClk(nFlags, point);
 }

@@ -82,7 +82,7 @@ static Card allCards[] = {
 
 static const int DECK_SIZE = 52 - 4 * 2;
 
-int GameState::InitializeNewGame()
+void GameState::InitializeNewGame()
 {
 	canRun = false;
 	health = MAX_HEALTH;
@@ -117,8 +117,6 @@ int GameState::InitializeNewGame()
 	{
 		remaining.AddTail(cardArray[i]);
 	}
-
-	return GAME_ERROR_NONE;
 }
 
 int GameState::DrawRoom()

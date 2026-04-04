@@ -39,7 +39,7 @@ class GameState
   public:
 	GameState();
 	virtual ~GameState();
-	int InitializeNewGame();
+	void InitializeNewGame();
 
 	int DrawRoom();
 	int RunAway();
