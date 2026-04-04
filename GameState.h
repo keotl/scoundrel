@@ -27,6 +27,13 @@ enum GameError
 	GAME_ERROR_EXCEED_WEAPON_DURABILITY
 };
 
+enum GameStatus
+{
+	GAME_STATUS_RUNNING,
+	GAME_STATUS_LOST,
+	GAME_STATUS_WON
+};
+
 class GameState
 {
   public:
@@ -41,18 +48,20 @@ class GameState
 	int FightBarehanded(int cardIndexInRoom);
 	int FightWithWeapon(int cardIndexInRoom);
 
+	GameStatus GetGameStatus();
+	int CalculateScore();
+
 	int health;
 	// Card arrays. Never deallocate cards, only move them from one array to the next.
 	CList<Card *, Card *> remaining;
-	CArray<Card *, Card *> discarded;
+	CList<Card *, Card *> discarded;
 	Card* activeWeapon;
 	CList<Card *, Card *> foughtByWeapon;
 
   private:
 	BOOL canRun;
 	BOOL canDrink;
-	static const int ROOM_SIZE = 4;
-	Card* room[ROOM_SIZE];
+	Card* room[4];
 };
 
 #endif // !defined(AFX_GAMESTATE_H__BFD6B92F_52AC_46E8_964D_4635056ADD9E__INCLUDED_)

@@ -393,6 +393,7 @@ DEP_CPP_DRAWU=\
 !ELSEIF  "$(CFG)" == "Scoundrel - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_DRAWU=\
+	".\Card.h"\
 	".\DrawUtils.h"\
 	".\Scoundrel.h"\
 	".\StdAfx.h"\
@@ -451,6 +452,85 @@ DEP_CPP_DRAWU=\
 # End Source File
 # Begin Source File
 
+SOURCE=.\GameState.cpp
+
+!IF  "$(CFG)" == "Scoundrel - Win32 (WCE MIPS) Release"
+
+DEP_CPP_GAMES=\
+	".\Card.h"\
+	".\GameState.h"\
+	".\Scoundrel.h"\
+	".\StdAfx.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Scoundrel - Win32 (WCE MIPS) Debug"
+
+DEP_CPP_GAMES=\
+	".\Card.h"\
+	".\GameState.h"\
+	".\Scoundrel.h"\
+	".\StdAfx.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Scoundrel - Win32 (WCE ARM) Release"
+
+DEP_CPP_GAMES=\
+	".\Card.h"\
+	".\GameState.h"\
+	".\Scoundrel.h"\
+	".\StdAfx.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Scoundrel - Win32 (WCE ARM) Debug"
+
+DEP_CPP_GAMES=\
+	".\Card.h"\
+	".\GameState.h"\
+	".\Scoundrel.h"\
+	".\StdAfx.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Scoundrel - Win32 (WCE x86) Release"
+
+DEP_CPP_GAMES=\
+	".\Card.h"\
+	".\GameState.h"\
+	".\Scoundrel.h"\
+	".\StdAfx.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Scoundrel - Win32 (WCE x86) Debug"
+
+DEP_CPP_GAMES=\
+	".\Card.h"\
+	".\GameState.h"\
+	".\Scoundrel.h"\
+	".\StdAfx.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Scoundrel - Win32 (WCE x86em) Release"
+
+DEP_CPP_GAMES=\
+	".\Card.h"\
+	".\GameState.h"\
+	".\Scoundrel.h"\
+	".\StdAfx.h"\
+	
+
+!ELSEIF  "$(CFG)" == "Scoundrel - Win32 (WCE x86em) Debug"
+
+DEP_CPP_GAMES=\
+	".\Card.h"\
+	".\GameState.h"\
+	".\Scoundrel.h"\
+	".\StdAfx.h"\
+	
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\Scoundrel.cpp
 
 !IF  "$(CFG)" == "Scoundrel - Win32 (WCE MIPS) Release"
@@ -464,6 +544,8 @@ DEP_CPP_SCOUN=\
 !ELSEIF  "$(CFG)" == "Scoundrel - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_SCOUN=\
+	".\Card.h"\
+	".\DrawUtils.h"\
 	".\Scoundrel.h"\
 	".\ScoundrelDlg.h"\
 	".\StdAfx.h"\
@@ -559,6 +641,7 @@ DEP_CPP_SCOUND=\
 !ELSEIF  "$(CFG)" == "Scoundrel - Win32 (WCE MIPS) Debug"
 
 DEP_CPP_SCOUND=\
+	".\Card.h"\
 	".\DrawUtils.h"\
 	".\Scoundrel.h"\
 	".\ScoundrelDlg.h"\
@@ -690,6 +773,10 @@ SOURCE=.\Card.h
 # Begin Source File
 
 SOURCE=.\DrawUtils.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\GameState.h
 # End Source File
 # Begin Source File
 

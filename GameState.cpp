@@ -91,18 +91,21 @@ int GameState::InitializeNewGame()
 	activeWeapon = NULL;
 	foughtByWeapon.RemoveAll();
 
-	for (int i = 0; i < ROOM_SIZE; i++)
+	int i;
+	for (i = 0; i < ROOM_SIZE; i++)
 	{
 		room[i] = NULL;
 	}
 
+	// Prepare temp array for shuffle
 	Card *cardArray[DECK_SIZE];
-	for (int i = 0; i < DECK_SIZE; i++)
+	for (i = 0; i < DECK_SIZE; i++)
 	{
 		cardArray[i] = &allCards[i];
 	}
 
-	for (int i = DECK_SIZE - 1; i > 0; i--)
+	// Shuffle deck
+	for (i = DECK_SIZE - 1; i > 0; i--)
 	{
 		int j = rand() % (i + 1);
 		Card *temp = cardArray[j];
@@ -110,7 +113,7 @@ int GameState::InitializeNewGame()
 		cardArray[i] = temp;
 	}
 
-	for (int i = 0; i < DECK_SIZE; i++)
+	for (i = 0; i < DECK_SIZE; i++)
 	{
 		remaining.AddTail(cardArray[i]);
 	}
@@ -122,7 +125,8 @@ int GameState::DrawRoom()
 {
 	canDrink = true;
 	int nonEmptyIndex = -1;
-	for (int i = 0; i < ROOM_SIZE; i++)
+	int i;
+	for (i = 0; i < ROOM_SIZE; i++)
 	{
 		if (room[i] != NULL)
 		{
@@ -137,7 +141,7 @@ int GameState::DrawRoom()
 	}
 
 	int emptySlots = 0;
-	for (int i = 0; i < ROOM_SIZE; i++)
+	for (i = 0; i < ROOM_SIZE; i++)
 	{
 		if (room[i] == NULL)
 		{
@@ -145,16 +149,11 @@ int GameState::DrawRoom()
 		}
 	}
 
-	if (emptySlots == ROOM_SIZE)
-	{
-		return GAME_ERROR_NONE;
-	}
+	int cardsToDraw = min(emptySlots, remaining.GetCount());
 
-	int cardsToDraw = min(emptySlots, remaining.GetSize());
-
-	for (int i = 0; i < cardsToDraw; i++)
+	for (i = 0; i < cardsToDraw; i++)
 	{
-		for (int j = 0; j < ROOM_SIZE; j++)
+		for (int j = 0; j < 4; j++)
 		{
 			if (room[j] == NULL)
 			{
@@ -174,7 +173,8 @@ int GameState::RunAway()
 		return GAME_ERROR_CANNOT_RUN;
 	}
 	canRun = false;
-	for (int i = 0; i < ROOM_SIZE; i++)
+	int i;
+	for (i = 0; i < ROOM_SIZE; i++)
 	{
 		if (room[i] != NULL)
 		{
@@ -198,7 +198,7 @@ int GameState::Equip(int cardIndexInRoom)
 	if (activeWeapon)
 	{
 		discarded.AddTail(activeWeapon);
-		while (foughtByWeapon.GetSize() > 0)
+		while (foughtByWeapon.GetCount() > 0)
 		{
 			discarded.AddTail(foughtByWeapon.RemoveHead());
 		}
@@ -215,19 +215,18 @@ int GameState::DrinkPotion(int cardIndexInRoom)
 	{
 		return GAME_ERROR_INVALID_CARD_INDEX;
 	}
-	if (!canDrink)
-	{
-		// No effect, already drank
-		return GAME_ERROR_NONE;
-	}
 	if (room[cardIndexInRoom]->suit != HEART)
 	{
 		return GAME_ERROR_NOT_A_POTION;
 	}
 
+	if (canDrink)
+	{
+		health += min(room[cardIndexInRoom]->Value(), MAX_HEALTH);
+	}
+
 	canDrink = false;
-	health += min(room[cardIndexInRoom]->Value(), MAX_HEALTH);
-	discarded.Add(room[cardIndexInRoom]);
+	discarded.AddTail(room[cardIndexInRoom]);
 	room[cardIndexInRoom] = NULL;
 	return GAME_ERROR_NONE;
 }
@@ -245,7 +244,7 @@ int GameState::FightBarehanded(int cardIndexInRoom)
 	}
 
 	health -= monster->Value();
-	discarded.Add(monster);
+	discarded.AddTail(monster);
 	room[cardIndexInRoom] = NULL;
 	return GAME_ERROR_NONE;
 }
@@ -261,12 +260,13 @@ int GameState::FightWithWeapon(int cardIndexInRoom)
 		return GAME_ERROR_NO_WEAPON_EQUIPPED;
 	}
 	Card *monster = room[cardIndexInRoom];
-	if (monster->suit != SPADE || monster->suit != CLUB)
+	if (monster->suit != SPADE && monster->suit != CLUB)
 	{
 		return GAME_ERROR_NOT_A_MONSTER;
 	}
+
 	int durability = 15;
-	if (foughtByWeapon.GetSize() > 0)
+	if (foughtByWeapon.GetCount() > 0)
 	{
 		durability = foughtByWeapon.GetTail()->Value();
 	}
@@ -279,4 +279,73 @@ int GameState::FightWithWeapon(int cardIndexInRoom)
 	foughtByWeapon.AddTail(monster);
 	room[cardIndexInRoom] = NULL;
 	return GAME_ERROR_NONE;
+}
+
+GameStatus GameState::GetGameStatus()
+{
+	if (health <= 0)
+	{
+		return GAME_STATUS_LOST;
+	}
+	Card *remainingPotion = NULL;
+	int remainingCardsInRoom = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		if (room[i] != NULL)
+		{
+			remainingCardsInRoom++;
+			if (room[i]->suit == HEART)
+			{
+				remainingPotion = room[i];
+			}
+		}
+	}
+	if (
+		(remaining.GetCount() == 0 && remainingCardsInRoom == 1 && remainingPotion != NULL) ||
+		(remaining.GetCount() == 0 && remainingCardsInRoom == 0))
+	{
+		return GAME_STATUS_WON;
+	}
+
+	return GAME_STATUS_RUNNING;
+}
+
+int GameState::CalculateScore()
+{
+	Card *remainingPotion = NULL;
+	int remainingMonsterHealth = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		if (room[i] != NULL)
+		{
+			if (room[i]->suit == HEART && remainingPotion == NULL)
+			{
+				remainingPotion = room[i];
+			}
+			else if (room[i]->suit == SPADE || room[i]->suit == CLUB)
+			{
+				remainingMonsterHealth += room[i]->Value();
+			}
+		}
+	}
+	POSITION pos = remaining.GetHeadPosition();
+	while (pos != NULL)
+	{
+		Card *card = remaining.GetNext(pos);
+		if (card->suit == SPADE || card->suit == CLUB)
+		{
+			remainingMonsterHealth += card->Value();
+		}
+	}
+
+	if (remainingMonsterHealth)
+	{
+		return -remainingMonsterHealth;
+	}
+	else if (remainingPotion)
+	{
+		return health + remainingPotion->Value();
+	}
+
+	return health;
 }
