@@ -4,4 +4,5 @@ rsync -av --no-perms --delete --inplace \
   --exclude='compile_flags.txt' \
   --exclude='compile_commands.json' \
   --exclude='*.sh' \
+  --exclude='vendor/' \
   ./ "/run/user/1004/gvfs/smb-share:server=192.168.122.102,share=shareddocs/Documents/Scoundrel/"

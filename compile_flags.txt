@@ -10,12 +10,12 @@
 -DWIN32
 -D_WIN32
 -I.
--I../wce-sdk/wce300/MS Pocket PC/include
--I../wce-sdk/wce300/MS Pocket PC/mfc/include
--I../wce-sdk/wce300/MS Pocket PC/atl/include
--I../Microsoft eMbedded Tools/EVC/Include
--I../Microsoft eMbedded Tools/EVC/Include/ObjModel
--I../Microsoft eMbedded Tools/EVC/Include/Win32
+-Ivendor/wce-sdk/include
+-Ivendor/wce-sdk/mfc/include
+-Ivendor/wce-sdk/atl/include
+-Ivendor/evc/Include
+-Ivendor/evc/Include/ObjModel
+-Ivendor/evc/Include/Win32
 -ferror-limit=0
 -Wno-pragma-once-outside-header
 -Wno-unknown-pragmas

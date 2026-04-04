@@ -7,7 +7,7 @@
 </h3>
 <h3>Command Lines</h3>
 Creating command line "rc.exe /l 0x409 /fo"MIPSDbg/Scoundrel.res" /d UNDER_CE=300 /d _WIN32_WCE=300 /d "UNICODE" /d "_UNICODE" /d "DEBUG" /d "WIN32_PLATFORM_PSPC" /d "MIPS" /d "_MIPS_" /d "_AFXDLL" /r "C:\Documents and Settings\All Users\Documents\Documents\Scoundrel\Scoundrel.rc"" 
-Creating temporary file "C:\DOCUME~1\Atreides\LOCALS~1\Temp\RSP24C.tmp" with contents
+Creating temporary file "C:\DOCUME~1\Atreides\LOCALS~1\Temp\RSP4D.tmp" with contents
 [
 /nologo /W3 /Zi /Od /D "DEBUG" /D "MIPS" /D "_MIPS_" /D UNDER_CE=300 /D _WIN32_WCE=300 /D "WIN32_PLATFORM_PSPC" /D "UNICODE" /D "_UNICODE" /D "_AFXDLL" /FR"MIPSDbg/" /Fp"MIPSDbg/Scoundrel.pch" /Yu"stdafx.h" /Fo"MIPSDbg/" /Fd"MIPSDbg/" /MC /c 
 "C:\Documents and Settings\All Users\Documents\Documents\Scoundrel\Card.cpp"
@@ -15,14 +15,14 @@ Creating temporary file "C:\DOCUME~1\Atreides\LOCALS~1\Temp\RSP24C.tmp" with con
 "C:\Documents and Settings\All Users\Documents\Documents\Scoundrel\Scoundrel.cpp"
 "C:\Documents and Settings\All Users\Documents\Documents\Scoundrel\ScoundrelDlg.cpp"
 ]
-Creating command line "clmips.exe @C:\DOCUME~1\Atreides\LOCALS~1\Temp\RSP24C.tmp" 
-Creating temporary file "C:\DOCUME~1\Atreides\LOCALS~1\Temp\RSP24D.tmp" with contents
+Creating command line "clmips.exe @C:\DOCUME~1\Atreides\LOCALS~1\Temp\RSP4D.tmp" 
+Creating temporary file "C:\DOCUME~1\Atreides\LOCALS~1\Temp\RSP4E.tmp" with contents
 [
 /nologo /W3 /Zi /Od /D "DEBUG" /D "MIPS" /D "_MIPS_" /D UNDER_CE=300 /D _WIN32_WCE=300 /D "WIN32_PLATFORM_PSPC" /D "UNICODE" /D "_UNICODE" /D "_AFXDLL" /FR"MIPSDbg/" /Fp"MIPSDbg/Scoundrel.pch" /Yc"stdafx.h" /Fo"MIPSDbg/" /Fd"MIPSDbg/" /MC /c 
 "C:\Documents and Settings\All Users\Documents\Documents\Scoundrel\StdAfx.cpp"
 ]
-Creating command line "clmips.exe @C:\DOCUME~1\Atreides\LOCALS~1\Temp\RSP24D.tmp" 
-Creating temporary file "C:\DOCUME~1\Atreides\LOCALS~1\Temp\RSP24E.tmp" with contents
+Creating command line "clmips.exe @C:\DOCUME~1\Atreides\LOCALS~1\Temp\RSP4E.tmp" 
+Creating temporary file "C:\DOCUME~1\Atreides\LOCALS~1\Temp\RSP4F.tmp" with contents
 [
 /nologo /base:"0x00010000" /stack:0x10000,0x1000 /entry:"wWinMainCRTStartup" /incremental:yes /pdb:"MIPSDbg/Scoundrel.pdb" /debug /out:"MIPSDbg/Scoundrel.exe" /subsystem:windowsce,3.00 /MACHINE:MIPS 
 ".\MIPSDbg\Card.obj"
@@ -32,7 +32,7 @@ Creating temporary file "C:\DOCUME~1\Atreides\LOCALS~1\Temp\RSP24E.tmp" with con
 ".\MIPSDbg\StdAfx.obj"
 ".\MIPSDbg\Scoundrel.res"
 ]
-Creating command line "link.exe @C:\DOCUME~1\Atreides\LOCALS~1\Temp\RSP24E.tmp"
+Creating command line "link.exe @C:\DOCUME~1\Atreides\LOCALS~1\Temp\RSP4F.tmp"
 <h3>Output Window</h3>
 Compiling resources...
 Compiling...
