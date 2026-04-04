@@ -2,6 +2,7 @@
 //
 
 #include "Card.h"
+#include "afxwin.h"
 #include "stdafx.h"
 #include "Scoundrel.h"
 #include "ScoundrelDlg.h"
@@ -57,6 +58,9 @@ BOOL CScoundrelDlg::OnInitDialog()
 
 	CenterWindow(GetDesktopWindow()); // center to the hpc screen
 
+	// Setup a random seed for rand()
+	srand((unsigned int) GetTickCount());
+
 	// TODO: Add extra initialization here
 	CClientDC dc(this);
 	this->drawUtils.Init(&dc);
@@ -71,17 +75,8 @@ void CScoundrelDlg::OnPaint()
 	CPaintDC dc(this);
 	CRect clientRect;
 	GetClientRect(&clientRect);
-	CBrush brush;
 
-	// Draw background
-	brush.CreateSolidBrush(RGB(0, 130, 0));
-	dc.FillRect(&clientRect, &brush);
-
-	// Draw room
-
-	// Draw Weapon + durability
-
-	// Draw discarded
+	drawUtils.DrawGameState(&dc, clientRect, game, draggingCardIndex);
 
 	// Do not call CDialog::OnPaint() for painting messages
 }

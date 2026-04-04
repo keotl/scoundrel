@@ -11,19 +11,23 @@
 
 #include "stdafx.h"
 #include "Card.h"
+#include "GameState.h"
 
 class DrawUtils
 {
   public:
-	void DrawCardAtPoint(CPoint point, Card card, CDC *dc);
-	void Init(CDC *dc);
 	DrawUtils();
 	virtual ~DrawUtils();
 
+	void Init(CDC *dc);
+	void DrawCardAtPoint(CPoint point, Card card, CDC *dc);
+	void DrawGameState(CDC *dc, CRect clientRect, const GameState& game, int ignoringRoomCardIndex);
+
   private:
+	CSize cardSize;
+	int roomCardMargin;
 	CFont cardFont;
 	CBitmap suitsSpritesheet;
-	CSize cardSize;
 	CDC suitsMemDC;
 	CDC cardCanvasDc;
 	void DrawSuitAtPoint(int x, int y, CardSuit suit, CDC *dc);

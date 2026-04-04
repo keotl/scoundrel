@@ -55,13 +55,14 @@ class GameState
 	// Card arrays. Never deallocate cards, only move them from one array to the next.
 	CList<Card *, Card *> remaining;
 	CList<Card *, Card *> discarded;
-	Card* activeWeapon;
+	Card *activeWeapon;
 	CList<Card *, Card *> foughtByWeapon;
+	Card *room[4];
 
+	static const int ROOM_SIZE;
   private:
 	BOOL canRun;
 	BOOL canDrink;
-	Card* room[4];
 };
 
 #endif // !defined(AFX_GAMESTATE_H__BFD6B92F_52AC_46E8_964D_4635056ADD9E__INCLUDED_)

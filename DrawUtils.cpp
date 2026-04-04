@@ -24,6 +24,7 @@ DrawUtils::DrawUtils()
 void DrawUtils::Init(CDC *dc)
 {
 	this->cardSize = CSize(29, 41);
+	this->roomCardMargin = 4;
 	this->cardFont.CreateFont(12, 0,
 							  0, 0,
 							  FW_BOLD,
@@ -47,8 +48,10 @@ void DrawUtils::DrawSuitAtPoint(int x, int y, CardSuit suit, CDC *dc)
 
 void DrawUtils::FlipDC180(CDC *pSrcDC, CDC *pDstDC, int width, int height)
 {
-	for (int y = 0; y < height; y++) {
-		for (int x = 0; x < width; x++) {
+	for (int y = 0; y < height; y++)
+	{
+		for (int x = 0; x < width; x++)
+		{
 			COLORREF pixel = pSrcDC->GetPixel(x, y);
 			pDstDC->SetPixel(width - 1 - x, height - 1 - y, pixel);
 		}
@@ -104,4 +107,33 @@ void DrawUtils::DrawCardAtPoint(CPoint point, Card card, CDC *dc)
 
 	dc->SelectObject(pOldPen);
 	dc->SelectObject(pOldBrush);
+}
+
+void DrawUtils::DrawGameState(CDC *dc, CRect clientRect, const GameState &game, int ignoringRoomCardIndex)
+{
+
+	// Draw background
+	CBrush brush;
+	brush.CreateSolidBrush(RGB(0, 130, 0));
+	dc->FillRect(&clientRect, &brush);
+
+	// Draw room
+	CPoint roomOrigin(clientRect.CenterPoint());
+	roomOrigin.Offset(-cardSize.cx * 2 - roomCardMargin * 2, 0);
+	roomOrigin.y = 40;
+
+	for (int i = 0; i < GameState::ROOM_SIZE; i++)
+	{
+		CPoint cardPos(roomOrigin);
+		cardPos.Offset((cardSize.cx + roomCardMargin) * i, 0);
+
+		if (game.room[i] != NULL)
+		{
+			DrawCardAtPoint(cardPos, *game.room[i], dc);
+		}
+	}
+
+	// Draw Weapon + durability
+
+	// Draw discarded
 }

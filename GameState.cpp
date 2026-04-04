@@ -17,8 +17,9 @@ static char THIS_FILE[] = __FILE__;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-static const int ROOM_SIZE = 4;
 static const int MAX_HEALTH = 20;
+
+const int GameState::ROOM_SIZE = 4;
 
 GameState::GameState()
 {
@@ -117,6 +118,7 @@ void GameState::InitializeNewGame()
 	{
 		remaining.AddTail(cardArray[i]);
 	}
+	DrawRoom();
 }
 
 int GameState::DrawRoom()
