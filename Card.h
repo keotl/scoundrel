@@ -21,9 +21,12 @@ class Card
 {
   public:
 	Card(int rank, CardSuit suit);
+	Card(const Card& other);
+	Card& operator=(const Card& other);
 	~Card();
 	int rank;
 	CardSuit suit;
+	int Value();
 };
 
 #endif // !defined(AFX_CARD_H__C31D4891_8D2D_4287_BFC0_0E5EAA6C3B4E__INCLUDED_)

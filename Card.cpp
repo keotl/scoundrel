@@ -21,7 +21,29 @@ Card::Card(int rank, CardSuit suit)
 {
 }
 
+Card::Card(const Card& other)
+	: rank(other.rank), suit(other.suit)
+{
+}
+
+Card& Card::operator=(const Card& other)
+{
+	if (this != &other) {
+		rank = other.rank;
+		suit = other.suit;
+	}
+	return *this;
+}
+
 Card::~Card()
 {
 
+}
+
+int Card::Value()
+{
+	if (rank == 1) {
+		return 14;
+	}
+	return rank;
 }

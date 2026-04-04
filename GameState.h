@@ -9,11 +9,50 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#include "stdafx.h"
+#include "Card.h"
+#include "afxtempl.h"
+
+enum GameError
+{
+	GAME_ERROR_NONE = 0,
+	GAME_ERROR_INVALID_ROOM_SIZE,
+	GAME_ERROR_INVALID_CARD_INDEX,
+	GAME_ERROR_CANNOT_RUN,
+	GAME_ERROR_NO_WEAPON_EQUIPPED,
+	GAME_ERROR_NO_ROOM_CARD,
+	GAME_ERROR_NOT_A_WEAPON,
+	GAME_ERROR_NOT_A_POTION,
+	GAME_ERROR_NOT_A_MONSTER,
+	GAME_ERROR_EXCEED_WEAPON_DURABILITY
+};
+
 class GameState
 {
   public:
 	GameState();
 	virtual ~GameState();
+	int InitializeNewGame();
+
+	int DrawRoom();
+	int RunAway();
+	int Equip(int cardIndexInRoom);
+	int DrinkPotion(int cardIndexInRoom);
+	int FightBarehanded(int cardIndexInRoom);
+	int FightWithWeapon(int cardIndexInRoom);
+
+	int health;
+	// Card arrays. Never deallocate cards, only move them from one array to the next.
+	CList<Card *, Card *> remaining;
+	CArray<Card *, Card *> discarded;
+	Card* activeWeapon;
+	CList<Card *, Card *> foughtByWeapon;
+
+  private:
+	BOOL canRun;
+	BOOL canDrink;
+	static const int ROOM_SIZE = 4;
+	Card* room[ROOM_SIZE];
 };
 
 #endif // !defined(AFX_GAMESTATE_H__BFD6B92F_52AC_46E8_964D_4635056ADD9E__INCLUDED_)
