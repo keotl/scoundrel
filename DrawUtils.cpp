@@ -25,6 +25,7 @@ DrawUtils::DrawUtils()
 void DrawUtils::Init(CDC *dc, CRect clientRect)
 {
 	this->bgColor = RGB(0, 130, 0);
+	this->darkerBgColor = RGB(0, 100, 0);
 	this->clientRect = clientRect;
 	this->cardSize = CSize(29, 41);
 	this->roomCardMargin = 3;
@@ -38,9 +39,19 @@ void DrawUtils::Init(CDC *dc, CRect clientRect)
 							  OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
 							  DEFAULT_QUALITY, DEFAULT_PITCH, _T("Tahoma"));
 	this->suitsSpritesheet.LoadBitmap(IDB_BITMAP1);
+	this->cardBackSpritesheet.LoadBitmap(IDB_BITMAP2);
 	this->suitsMemDC.CreateCompatibleDC(dc);
 	this->suitsMemDC.SelectObject(&suitsSpritesheet);
+	this->cardBackMemDC.CreateCompatibleDC(dc);
+	this->cardBackMemDC.SelectObject(&cardBackSpritesheet);
 	this->cardCanvasDc.CreateCompatibleDC(dc);
+	this->armourOrigin.x = roomOrigin.x;
+	this->armourOrigin.y = roomOrigin.y + 60;
+	this->durabilityOrigin.x = armourOrigin.x + cardSize.cx + 8;
+	this->durabilityOrigin.y = armourOrigin.y;
+	this->deckOrigin = CPoint(4, roomOrigin.y);
+	this->usePlaceholderOrigin = CPoint(clientRect.Width() - 4 - cardSize.cx, roomOrigin.y);
+	this->selectedCardBack = 0;
 }
 
 DrawUtils::~DrawUtils()
@@ -68,7 +79,7 @@ void DrawUtils::DrawCardAtPoint(CPoint point, const Card *card, CDC *dc)
 {
 	// Prepare label+suit canvas (10px wide, 18px tall: 10 for rank + 8 for suit)
 	int canvasW = 17;
-	int canvasH = 18;
+	int canvasH = 20;
 	CBitmap canvas;
 	canvas.CreateCompatibleBitmap(dc, canvasW, canvasH);
 	cardCanvasDc.SelectObject(&canvas);
@@ -81,14 +92,12 @@ void DrawUtils::DrawCardAtPoint(CPoint point, const Card *card, CDC *dc)
 	CRect labelRect(CPoint(0, 0), CSize(10, 10));
 	cardCanvasDc.SetTextColor(RGB(0, 0, 0));
 	cardCanvasDc.SelectObject(&this->cardFont);
-	CString rankStr;
-	rankStr.Format(_T("%d"), card->rank);
-	cardCanvasDc.DrawText(rankStr, labelRect, DT_CENTER);
+	cardCanvasDc.DrawText(card->Label(), labelRect, DT_CENTER);
 
 	// Draw suit next to rank
-	cardCanvasDc.BitBlt(10, 1, 7, 8, &this->suitsMemDC, 7 * card->suit, 0, SRCCOPY);
+	cardCanvasDc.BitBlt(10, 2, 7, 8, &this->suitsMemDC, 7 * card->suit, 0, SRCCOPY);
 	// Draw suit below rank
-	cardCanvasDc.BitBlt(1, 10, 7, 8, &this->suitsMemDC, 7 * card->suit, 0, SRCCOPY);
+	cardCanvasDc.BitBlt(1, 12, 7, 8, &this->suitsMemDC, 7 * card->suit, 0, SRCCOPY);
 
 	// Draw card outline
 	CPen pen(PS_SOLID, 1, RGB(0, 0, 0));
@@ -117,15 +126,16 @@ void DrawUtils::DrawCardAtPoint(CPoint point, const Card *card, CDC *dc)
 
 void DrawUtils::DrawGameState(CDC *dc, const GameState &game, int ignoringRoomCardIndex)
 {
+	CBrush brush;
+	CPen pen;
 
 	// Draw background
-	CBrush brush;
 	brush.CreateSolidBrush(bgColor);
 	dc->FillRect(&this->clientRect, &brush);
 
 	// Draw room
-
-	for (int i = 0; i < GameState::ROOM_SIZE; i++)
+	int i;
+	for (i = 0; i < GameState::ROOM_SIZE; i++)
 	{
 		CPoint cardPos(roomOrigin);
 		cardPos.Offset((cardSize.cx + roomCardMargin) * i, 0);
@@ -137,8 +147,51 @@ void DrawUtils::DrawGameState(CDC *dc, const GameState &game, int ignoringRoomCa
 	}
 
 	// Draw Weapon + durability
+	CRect armourRegion = CRect(armourOrigin, cardSize);
+	dc->FillSolidRect(armourRegion, darkerBgColor);
+	CRect durabilityRegion = CRect(durabilityOrigin, CSize(cardSize.cx * 3, cardSize.cy));
+	dc->FillSolidRect(durabilityRegion, darkerBgColor);
 
-	// Draw discarded
+	CPoint durabilityCardPos(durabilityOrigin);
+	for (POSITION pos = game.foughtByWeapon.GetHeadPosition(); pos != NULL;)
+	{
+		Card *card = game.foughtByWeapon.GetNext(pos);
+		durabilityCardPos.Offset(16, 0);
+		DrawCardAtPoint(durabilityCardPos, card, dc);
+	}
+
+	// Draw deck
+	CPoint deckCardOrigin(deckOrigin);
+
+	if (game.remaining.GetCount() == 0)
+	{
+		// Empty deck placeholder
+		pen.CreatePen(PS_DASH, 1, RGB(10, 10, 10));
+		dc->SelectObject(&pen);
+		dc->SelectObject(CBrush::FromHandle((HBRUSH)GetStockObject(NULL_BRUSH)));
+		dc->Rectangle(CRect(deckOrigin, cardSize));
+		pen.DeleteObject();
+		pen.CreatePen(PS_SOLID, 3, RGB(0, 255, 0));
+		dc->SelectObject(&pen);
+		CPoint deckCenter = CRect(deckOrigin, cardSize).CenterPoint();
+		dc->Ellipse(CRect(deckCenter.x - 10, deckCenter.y - 10, deckCenter.x + 10, deckCenter.y + 10));
+		pen.DeleteObject();
+	}
+	else
+	{
+		for (i = 0; i < min(game.remaining.GetCount() / 10, 2) + 1; i++)
+		{
+			DrawCardBackAtPoint(deckCardOrigin, dc);
+			deckCardOrigin.Offset(2, 1);
+		}
+	}
+
+	// Draw usage placeholder
+	pen.CreatePen(PS_DASH, 1, RGB(10, 10, 10));
+	CRect usagePlaceholder(usePlaceholderOrigin, cardSize);
+	dc->SelectObject(&pen);
+	dc->SelectObject(CBrush::FromHandle((HBRUSH)GetStockObject(NULL_BRUSH)));
+	dc->Rectangle(usagePlaceholder);
 }
 
 int DrawUtils::GetRoomCardIndexAtPoint(const CPoint &point)
@@ -163,4 +216,9 @@ void DrawUtils::TransferRoomCard(CDC *backgroundDc, CDC *foregroundDc, int roomC
 	CRect cardRect = GetRoomCardRect(roomCardIndex);
 	foregroundDc->BitBlt(0, 0, cardSize.cx, cardSize.cy, backgroundDc, cardRect.TopLeft().x, cardRect.TopLeft().y, SRCCOPY);
 	backgroundDc->FillSolidRect(cardRect, bgColor);
+}
+
+void DrawUtils::DrawCardBackAtPoint(CPoint point, CDC *dc)
+{
+	dc->BitBlt(point.x, point.y, cardSize.cx, cardSize.cy, &cardBackMemDC, 0, 0, SRCCOPY);
 }

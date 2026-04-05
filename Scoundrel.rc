@@ -151,6 +151,7 @@ END
 //
 
 IDB_BITMAP1             BITMAP  DISCARDABLE     "suits.bmp"
+IDB_BITMAP2             BITMAP  DISCARDABLE     "backs.BMP"
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 

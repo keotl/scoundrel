@@ -8,7 +8,7 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
@@ -21,14 +21,15 @@ Card::Card(int rank, CardSuit suit)
 {
 }
 
-Card::Card(const Card& other)
+Card::Card(const Card &other)
 	: rank(other.rank), suit(other.suit)
 {
 }
 
-Card& Card::operator=(const Card& other)
+Card &Card::operator=(const Card &other)
 {
-	if (this != &other) {
+	if (this != &other)
+	{
 		rank = other.rank;
 		suit = other.suit;
 	}
@@ -37,13 +38,28 @@ Card& Card::operator=(const Card& other)
 
 Card::~Card()
 {
-
 }
 
 int Card::Value()
 {
-	if (rank == 1) {
+	if (rank == 1)
+	{
 		return 14;
 	}
 	return rank;
+}
+
+CString Card::Label() const
+{
+	if (rank == 1)
+		return _T("A");
+	if (rank == 11)
+		return _T("J");
+	if (rank == 12)
+		return _T("Q");
+	if (rank == 13)
+		return _T("K");
+	CString str;
+	str.Format(_T("%d"), rank);
+	return str;
 }

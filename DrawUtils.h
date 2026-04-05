@@ -22,23 +22,37 @@ class DrawUtils
 
 	void Init(CDC *dc, CRect clientRect);
 	void DrawCardAtPoint(CPoint point, const Card *card, CDC *dc);
-	void DrawGameState(CDC *dc, const GameState& game, int ignoringRoomCardIndex);
-	int GetRoomCardIndexAtPoint(const CPoint& point);
+	void DrawCardBackAtPoint(CPoint point, CDC *dc);
+	void DrawGameState(CDC *dc, const GameState &game, int ignoringRoomCardIndex);
+	int GetRoomCardIndexAtPoint(const CPoint &point);
 	void TransferRoomCard(CDC *backgroundDc, CDC *foregroundDc, int roomCardIndex);
 	CRect GetRoomCardRect(int roomCardIndex);
+	BOOL IsPointInArmourRegion(const CPoint &point);
+	BOOL IsPointInDurabilityRegion(const CPoint &point);
+	BOOL IsPointInUsePlaceholderRegion(const CPoint &point);
+	BOOL IsPointInDeckRegion(const CPoint &point);
 
 	CSize cardSize;
 	CPoint roomOrigin;
 	CRect clientRect;
+
   private:
 	int roomCardMargin;
 	CFont cardFont;
 	CBitmap suitsSpritesheet;
+	CBitmap cardBackSpritesheet;
 	CDC suitsMemDC;
+	CDC cardBackMemDC;
 	CDC cardCanvasDc;
 	void DrawSuitAtPoint(int x, int y, CardSuit suit, CDC *dc);
 	void FlipDC180(CDC *pSrcDC, CDC *pDstDC, int width, int height);
 	COLORREF bgColor;
+	COLORREF darkerBgColor;
+	CPoint armourOrigin;
+	CPoint durabilityOrigin;
+	CPoint deckOrigin;
+	CPoint usePlaceholderOrigin;
+	int selectedCardBack;
 };
 
 #endif // !defined(AFX_DRAWUTILS_H__EACA2ACB_396D_4BA1_AAE2_2507686CDD75__INCLUDED_)
