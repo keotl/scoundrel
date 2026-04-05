@@ -2,6 +2,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#include "Card.h"
 #include "afxwin.h"
 #include "stdafx.h"
 #include "Scoundrel.h"
@@ -93,10 +94,9 @@ void DrawUtils::DrawCardAtPoint(CPoint point, const Card *card, CDC *dc)
 	// Clear canvas to white
 	cardCanvasDc.FillSolidRect(0, 0, canvasW, canvasH, RGB(255, 255, 255));
 
-	// TODO - select suit color  - keotl 2026-04-03
 	// Draw rank label
-	CRect labelRect(CPoint(0, 0), CSize(10, 10));
-	cardCanvasDc.SetTextColor(RGB(0, 0, 0));
+	CRect labelRect(CPoint(0, 0), CSize(10, 12));
+	cardCanvasDc.SetTextColor(RGB((card->suit == HEART || card->suit == DIAMOND) ? 132 : 0, 0, 0));
 	cardCanvasDc.SelectObject(&this->cardFont);
 	cardCanvasDc.DrawText(card->Label(), labelRect, DT_CENTER);
 
@@ -153,8 +153,15 @@ void DrawUtils::DrawGameState(CDC *dc, const GameState &game, int ignoringRoomCa
 	}
 
 	// Draw Weapon + durability
-	CRect armourRegion = CRect(armourOrigin, cardSize);
-	dc->FillSolidRect(armourRegion, darkerBgColor);
+	if (game.activeWeapon == NULL)
+	{
+		CRect armourRegion = CRect(armourOrigin, cardSize);
+		dc->FillSolidRect(armourRegion, darkerBgColor);
+	}
+	else
+	{
+		DrawCardAtPoint(armourOrigin, game.activeWeapon, dc);
+	}
 	CRect durabilityRegion = CRect(durabilityOrigin, CSize(cardSize.cx * 3, cardSize.cy));
 	dc->FillSolidRect(durabilityRegion, darkerBgColor);
 
@@ -162,8 +169,8 @@ void DrawUtils::DrawGameState(CDC *dc, const GameState &game, int ignoringRoomCa
 	for (POSITION pos = game.foughtByWeapon.GetHeadPosition(); pos != NULL;)
 	{
 		Card *card = game.foughtByWeapon.GetNext(pos);
-		durabilityCardPos.Offset(8, 0);
 		DrawCardAtPoint(durabilityCardPos, card, dc);
+		durabilityCardPos.Offset(8, 0);
 	}
 
 	// Draw deck
