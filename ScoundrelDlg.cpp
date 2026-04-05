@@ -296,6 +296,8 @@ void CScoundrelDlg::OnLButtonUp(UINT nFlags, CPoint point)
 
 			if (game.ShouldDraw())
 			{
+				// Blit earlier for immediate feedback, since full repaint is quite slow
+				BlitInMemoryDCs(&dc);
 				game.DrawRoom();
 				game.SetCanRun();
 				int deckSize = game.remaining.GetCount() == 0 ? 0 : 1 + game.remaining.GetCount() / 10;
@@ -304,8 +306,6 @@ void CScoundrelDlg::OnLButtonUp(UINT nFlags, CPoint point)
 					previousDeckSize = deckSize;
 					drawUtils.RepaintDeck(&backgroundDc, deckSize);
 				}
-
-				// TODO - faster better incremental room repaint  - keotl 2026-04-05
 				drawUtils.RepaintRoom(&backgroundDc, game, -1);
 			}
 		}

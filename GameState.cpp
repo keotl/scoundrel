@@ -124,42 +124,11 @@ void GameState::InitializeNewGame()
 int GameState::DrawRoom()
 {
 	canDrink = true;
-	int nonEmptyIndex = -1;
-	int i;
-	for (i = 0; i < ROOM_SIZE; i++)
+	for (int j = 0; j < ROOM_SIZE; j++)
 	{
-		if (room[i] != NULL)
+		if (room[j] == NULL && remaining.GetCount() > 0)
 		{
-			nonEmptyIndex = i;
-		}
-	}
-
-	if (nonEmptyIndex > 0)
-	{
-		room[0] = room[nonEmptyIndex];
-		room[nonEmptyIndex] = NULL;
-	}
-
-	int emptySlots = 0;
-	for (i = 0; i < ROOM_SIZE; i++)
-	{
-		if (room[i] == NULL)
-		{
-			emptySlots++;
-		}
-	}
-
-	int cardsToDraw = min(emptySlots, remaining.GetCount());
-
-	for (i = 0; i < cardsToDraw; i++)
-	{
-		for (int j = 0; j < 4; j++)
-		{
-			if (room[j] == NULL)
-			{
-				room[j] = remaining.RemoveHead();
-				break;
-			}
+			room[j] = remaining.RemoveHead();
 		}
 	}
 
