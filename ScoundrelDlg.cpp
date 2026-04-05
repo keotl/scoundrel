@@ -191,6 +191,7 @@ void CScoundrelDlg::OnLButtonUp(UINT nFlags, CPoint point)
 			else
 			{
 				drawUtils.TransferForegroundCardToArmourRegion(&backgroundDc, &foregroundDc);
+				drawUtils.DrawHUD(&backgroundDc, game, _T("Equiped weapon!"));
 			}
 		}
 		else if (drawUtils.IsPointInDurabilityRegion(point))
@@ -204,7 +205,7 @@ void CScoundrelDlg::OnLButtonUp(UINT nFlags, CPoint point)
 			else
 			{
 				drawUtils.TransferForegroundCardToDurabilityRegion(&backgroundDc, &foregroundDc, game.foughtByWeapon.GetCount() - 1);
-				drawUtils.DrawHUD(&backgroundDc, game);
+				drawUtils.DrawHUD(&backgroundDc, game, _T("Fought with weapon!"));
 			}
 		}
 		else if (drawUtils.IsPointInUsePlaceholderRegion(point))
@@ -220,7 +221,7 @@ void CScoundrelDlg::OnLButtonUp(UINT nFlags, CPoint point)
 				}
 				else
 				{
-					drawUtils.DrawHUD(&backgroundDc, game);
+					drawUtils.DrawHUD(&backgroundDc, game, _T("Fought barehanded!"));
 				}
 			}
 			else if (card != NULL && (card->suit == HEART))
@@ -233,7 +234,7 @@ void CScoundrelDlg::OnLButtonUp(UINT nFlags, CPoint point)
 				}
 				else
 				{
-					drawUtils.DrawHUD(&backgroundDc, game);
+					drawUtils.DrawHUD(&backgroundDc, game, _T("Drank potion!"));
 				}
 			}
 			else

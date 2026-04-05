@@ -35,7 +35,7 @@ class DrawUtils
 	BOOL IsPointInDurabilityRegion(const CPoint &point);
 	BOOL IsPointInUsePlaceholderRegion(const CPoint &point);
 	BOOL IsPointInDeckRegion(const CPoint &point);
-	void DrawHUD(CDC*backgroundDc, const GameState &game);
+	void DrawHUD(CDC*backgroundDc, const GameState &game, CString actionMessage);
 
 	CSize cardSize;
 	CPoint roomOrigin;

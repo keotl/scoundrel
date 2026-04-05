@@ -57,7 +57,7 @@ void DrawUtils::Init(CDC *dc, CRect clientRect)
 	this->deckRegion = CRect(deckOrigin, CSize(cardSize.cx + 4, cardSize.cy + 3));
 	this->selectedCardBack = 0;
 	this->hudRegion = CRect(0, clientRect.BottomRight().y - 20, clientRect.BottomRight().x, clientRect.BottomRight().y);
-	this->hudColor = RGB(200,200,200);
+	this->hudColor = RGB(200, 200, 200);
 }
 
 DrawUtils::~DrawUtils()
@@ -200,7 +200,7 @@ void DrawUtils::DrawGameState(CDC *dc, const GameState &game, int ignoringRoomCa
 	dc->Rectangle(usagePlaceholder);
 
 	// Draw HUD
-	DrawHUD(dc, game);
+	DrawHUD(dc, game, _T( "" ));
 }
 
 int DrawUtils::GetRoomCardIndexAtPoint(const CPoint &point)
@@ -274,10 +274,12 @@ void DrawUtils::ClearDurabilityRegion(CDC *backgroundDc)
 	backgroundDc->FillSolidRect(durabilityRegion, darkerBgColor);
 }
 
-void DrawUtils::DrawHUD(CDC *backgroundDc, const GameState &game)
+void DrawUtils::DrawHUD(CDC *backgroundDc, const GameState &game, CString actionMessage)
 {
 	backgroundDc->FillSolidRect(hudRegion, hudColor);
+	CRect healthRect(hudRegion.left + 2, hudRegion.top + 2, hudRegion.right - 2, hudRegion.bottom - 2);
 	CString str;
 	str.Format(_T( "Health: %d" ), game.health);
-	backgroundDc->DrawText(str, hudRegion, DT_LEFT);
+	backgroundDc->DrawText(str, healthRect, DT_LEFT);
+	backgroundDc->DrawText(actionMessage, healthRect, DT_RIGHT);
 }
