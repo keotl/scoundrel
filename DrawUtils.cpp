@@ -5,6 +5,7 @@
 #include "afxwin.h"
 #include "stdafx.h"
 #include "Scoundrel.h"
+#include "wingdi.h"
 #include "DrawUtils.h"
 
 #ifdef _DEBUG
@@ -23,9 +24,10 @@ DrawUtils::DrawUtils()
 
 void DrawUtils::Init(CDC *dc, CRect clientRect)
 {
+	this->bgColor = RGB(0, 130, 0);
 	this->clientRect = clientRect;
 	this->cardSize = CSize(29, 41);
-	this->roomCardMargin = 4;
+	this->roomCardMargin = 3;
 	this->roomOrigin = clientRect.CenterPoint();
 	this->roomOrigin.Offset(-cardSize.cx * 2 - roomCardMargin * 2, 0);
 	this->roomOrigin.y = 40;
@@ -118,7 +120,7 @@ void DrawUtils::DrawGameState(CDC *dc, const GameState &game, int ignoringRoomCa
 
 	// Draw background
 	CBrush brush;
-	brush.CreateSolidBrush(RGB(0, 130, 0));
+	brush.CreateSolidBrush(bgColor);
 	dc->FillRect(&this->clientRect, &brush);
 
 	// Draw room
@@ -146,4 +148,19 @@ int DrawUtils::GetRoomCardIndexAtPoint(const CPoint &point)
 		return -1;
 	}
 	return (point.x - roomOrigin.x) / (cardSize.cx + roomCardMargin);
+}
+
+CRect DrawUtils::GetRoomCardRect(int roomCardIndex)
+{
+	CPoint cardPos(roomOrigin);
+	cardPos.Offset((cardSize.cx + roomCardMargin) * roomCardIndex, 0);
+	CRect result(cardPos, cardSize);
+	return result;
+}
+
+void DrawUtils::TransferRoomCard(CDC *backgroundDc, CDC *foregroundDc, int roomCardIndex)
+{
+	CRect cardRect = GetRoomCardRect(roomCardIndex);
+	foregroundDc->BitBlt(0, 0, cardSize.cx, cardSize.cy, backgroundDc, cardRect.TopLeft().x, cardRect.TopLeft().y, SRCCOPY);
+	backgroundDc->FillSolidRect(cardRect, bgColor);
 }

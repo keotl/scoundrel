@@ -2,6 +2,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#include "windef.h"
 #if !defined(AFX_DRAWUTILS_H__EACA2ACB_396D_4BA1_AAE2_2507686CDD75__INCLUDED_)
 #define AFX_DRAWUTILS_H__EACA2ACB_396D_4BA1_AAE2_2507686CDD75__INCLUDED_
 
@@ -23,6 +24,8 @@ class DrawUtils
 	void DrawCardAtPoint(CPoint point, const Card *card, CDC *dc);
 	void DrawGameState(CDC *dc, const GameState& game, int ignoringRoomCardIndex);
 	int GetRoomCardIndexAtPoint(const CPoint& point);
+	void TransferRoomCard(CDC *backgroundDc, CDC *foregroundDc, int roomCardIndex);
+	CRect GetRoomCardRect(int roomCardIndex);
 
 	CSize cardSize;
 	CPoint roomOrigin;
@@ -35,6 +38,7 @@ class DrawUtils
 	CDC cardCanvasDc;
 	void DrawSuitAtPoint(int x, int y, CardSuit suit, CDC *dc);
 	void FlipDC180(CDC *pSrcDC, CDC *pDstDC, int width, int height);
+	COLORREF bgColor;
 };
 
 #endif // !defined(AFX_DRAWUTILS_H__EACA2ACB_396D_4BA1_AAE2_2507686CDD75__INCLUDED_)

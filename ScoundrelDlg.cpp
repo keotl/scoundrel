@@ -75,27 +75,41 @@ BOOL CScoundrelDlg::OnInitDialog()
 	this->foregroundBitmap.CreateCompatibleBitmap(&dc, drawUtils.cardSize.cx, drawUtils.cardSize.cy);
 	this->foregroundDc.CreateCompatibleDC(&dc);
 	this->foregroundDc.SelectObject(&foregroundBitmap);
+	this->fbBitmap.CreateCompatibleBitmap(&dc, clientRect.Width(), clientRect.Height());
+	this->fbDc.CreateCompatibleDC(&dc);
+	this->fbDc.SelectObject(&fbBitmap);
 
 	return TRUE; // return TRUE  unless you set the focus to a control
 }
 
-void CScoundrelDlg::PaintInMemoryDCs()
+void CScoundrelDlg::PaintForegroundDC()
 {
-	drawUtils.DrawGameState(&backgroundDc, game, draggingCardIndex);
 	if (draggingCardIndex != -1 && game.room[draggingCardIndex] != NULL)
 	{
 		drawUtils.DrawCardAtPoint(CPoint(0, 0), game.room[draggingCardIndex], &foregroundDc);
 	}
 }
 
+void CScoundrelDlg::PaintInMemoryDCs()
+{
+	drawUtils.DrawGameState(&backgroundDc, game, draggingCardIndex);
+	PaintForegroundDC();
+}
+
 void CScoundrelDlg::BlitInMemoryDCs(CDC *pDC)
 {
-	pDC->BitBlt(0, 0, drawUtils.clientRect.Width(), drawUtils.clientRect.Height(), &backgroundDc, 0, 0, SRCCOPY);
-
-	if (draggingCardIndex != -1 && game.room[draggingCardIndex] != NULL)
+	if (draggingCardIndex == -1 || game.room[draggingCardIndex] == NULL)
 	{
-		pDC->BitBlt(dragX, dragY, drawUtils.cardSize.cx, drawUtils.cardSize.cy, &foregroundDc, 0, 0, SRCCOPY);
+		// Nothing to render in foreground, blit background directly to dc
+		pDC->BitBlt(0, 0, drawUtils.clientRect.Width(), drawUtils.clientRect.Height(), &backgroundDc, 0, 0, SRCCOPY);
+		return;
 	}
+
+	fbDc.BitBlt(0, 0, drawUtils.clientRect.Width(), drawUtils.clientRect.Height(), &backgroundDc, 0, 0, SRCCOPY);
+
+	fbDc.BitBlt(dragX - dragMouseIntrinsicOffsetX, dragY - dragMouseIntrinsicOffsetY, drawUtils.cardSize.cx, drawUtils.cardSize.cy, &foregroundDc, 0, 0, SRCCOPY);
+
+	pDC->BitBlt(0, 0, drawUtils.clientRect.Width(), drawUtils.clientRect.Height(), &fbDc, 0, 0, SRCCOPY);
 }
 
 void CScoundrelDlg::OnPaint()
@@ -112,11 +126,15 @@ void CScoundrelDlg::OnLButtonDown(UINT nFlags, CPoint point)
 	int roomCardIndex = drawUtils.GetRoomCardIndexAtPoint(point);
 	if (roomCardIndex != -1 && game.room[roomCardIndex] != NULL)
 	{
+		CRect cardRect = drawUtils.GetRoomCardRect(roomCardIndex);
 		draggingCardIndex = roomCardIndex;
 		dragX = point.x;
 		dragY = point.y;
+		dragMouseIntrinsicOffsetX = point.x - cardRect.TopLeft().x;
+		dragMouseIntrinsicOffsetY = point.y - cardRect.TopLeft().y;
+
 		CClientDC dc(this);
-		PaintInMemoryDCs();
+		drawUtils.TransferRoomCard(&backgroundDc, &foregroundDc, roomCardIndex);
 		BlitInMemoryDCs(&dc);
 	}
 
@@ -127,8 +145,8 @@ void CScoundrelDlg::OnMouseMove(UINT nFlags, CPoint point)
 {
 	if (draggingCardIndex != -1)
 	{
-		int newX = point.x / 5 * 5;
-		int newY = point.y / 5 * 5;
+		int newX = point.x / 4 * 4;
+		int newY = point.y / 4 * 4;
 		if (newX == dragX && newY == dragY)
 			return;
 

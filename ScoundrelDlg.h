@@ -15,24 +15,27 @@
 
 class CScoundrelDlg : public CDialog
 {
-// Construction
-public:
-	CScoundrelDlg(CWnd* pParent = NULL);	// standard constructor
+	// Construction
+  public:
+	CScoundrelDlg(CWnd *pParent = NULL); // standard constructor
 
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CScoundrelDlg)
-	enum { IDD = IDD_SCOUNDREL_DIALOG };
-		// NOTE: the ClassWizard will add data members here
+	enum
+	{
+		IDD = IDD_SCOUNDREL_DIALOG
+	};
+	// NOTE: the ClassWizard will add data members here
 	//}}AFX_DATA
 
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CScoundrelDlg)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
-	//}}AFX_VIRTUAL
+  protected:
+	virtual void DoDataExchange(CDataExchange *pDX); // DDX/DDV support
+													 //}}AFX_VIRTUAL
 
-// Implementation
-protected:
+	// Implementation
+  protected:
 	HICON m_hIcon;
 
 	// Generated message map functions
@@ -45,16 +48,22 @@ protected:
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
-private:
+  private:
 	DrawUtils drawUtils;
 	GameState game;
 	int draggingCardIndex;
 	int dragX;
 	int dragY;
+	int dragMouseIntrinsicOffsetX;
+	int dragMouseIntrinsicOffsetY;
 	CBitmap backgroundBitmap;
 	CDC backgroundDc; // Everything, except card being dragged
 	CBitmap foregroundBitmap;
 	CDC foregroundDc; // Card being dragged around
+	CBitmap fbBitmap;
+	CDC fbDc; // Final framebuffer, to be blitted directly to client.
+
+	void PaintForegroundDC();
 	void PaintInMemoryDCs();
 	void BlitInMemoryDCs(CDC *pDC);
 };
