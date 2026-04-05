@@ -19,12 +19,15 @@ class DrawUtils
 	DrawUtils();
 	virtual ~DrawUtils();
 
-	void Init(CDC *dc);
-	void DrawCardAtPoint(CPoint point, Card card, CDC *dc);
-	void DrawGameState(CDC *dc, CRect clientRect, const GameState& game, int ignoringRoomCardIndex);
+	void Init(CDC *dc, CRect clientRect);
+	void DrawCardAtPoint(CPoint point, const Card *card, CDC *dc);
+	void DrawGameState(CDC *dc, const GameState& game, int ignoringRoomCardIndex);
+	int GetRoomCardIndexAtPoint(const CPoint& point);
 
-  private:
 	CSize cardSize;
+	CPoint roomOrigin;
+	CRect clientRect;
+  private:
 	int roomCardMargin;
 	CFont cardFont;
 	CBitmap suitsSpritesheet;

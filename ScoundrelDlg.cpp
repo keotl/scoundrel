@@ -7,6 +7,7 @@
 #include "Scoundrel.h"
 #include "ScoundrelDlg.h"
 #include "DrawUtils.h"
+#include "wingdi.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -41,6 +42,7 @@ BEGIN_MESSAGE_MAP(CScoundrelDlg, CDialog)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_MOUSEMOVE()
 	ON_WM_LBUTTONDBLCLK()
+	ON_WM_LBUTTONUP()
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -59,49 +61,99 @@ BOOL CScoundrelDlg::OnInitDialog()
 	CenterWindow(GetDesktopWindow()); // center to the hpc screen
 
 	// Setup a random seed for rand()
-	srand((unsigned int) GetTickCount());
+	srand((unsigned int)GetTickCount());
 
-	// TODO: Add extra initialization here
+	CRect clientRect;
+	GetClientRect(&clientRect);
 	CClientDC dc(this);
-	this->drawUtils.Init(&dc);
+	this->drawUtils.Init(&dc, clientRect);
 	this->game.InitializeNewGame();
 	this->draggingCardIndex = -1;
+	this->backgroundBitmap.CreateCompatibleBitmap(&dc, clientRect.Width(), clientRect.Height());
+	this->backgroundDc.CreateCompatibleDC(&dc);
+	this->backgroundDc.SelectObject(&backgroundBitmap);
+	this->foregroundBitmap.CreateCompatibleBitmap(&dc, drawUtils.cardSize.cx, drawUtils.cardSize.cy);
+	this->foregroundDc.CreateCompatibleDC(&dc);
+	this->foregroundDc.SelectObject(&foregroundBitmap);
 
 	return TRUE; // return TRUE  unless you set the focus to a control
+}
+
+void CScoundrelDlg::PaintInMemoryDCs()
+{
+	drawUtils.DrawGameState(&backgroundDc, game, draggingCardIndex);
+	if (draggingCardIndex != -1 && game.room[draggingCardIndex] != NULL)
+	{
+		drawUtils.DrawCardAtPoint(CPoint(0, 0), game.room[draggingCardIndex], &foregroundDc);
+	}
+}
+
+void CScoundrelDlg::BlitInMemoryDCs(CDC *pDC)
+{
+	pDC->BitBlt(0, 0, drawUtils.clientRect.Width(), drawUtils.clientRect.Height(), &backgroundDc, 0, 0, SRCCOPY);
+
+	if (draggingCardIndex != -1 && game.room[draggingCardIndex] != NULL)
+	{
+		pDC->BitBlt(dragX, dragY, drawUtils.cardSize.cx, drawUtils.cardSize.cy, &foregroundDc, 0, 0, SRCCOPY);
+	}
 }
 
 void CScoundrelDlg::OnPaint()
 {
 	CPaintDC dc(this);
-	CRect clientRect;
-	GetClientRect(&clientRect);
-
-	drawUtils.DrawGameState(&dc, clientRect, game, draggingCardIndex);
+	PaintInMemoryDCs();
+	BlitInMemoryDCs(&dc);
 
 	// Do not call CDialog::OnPaint() for painting messages
 }
 
 void CScoundrelDlg::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
-	CClientDC dc(this);
-
-	Card card(3, HEART);
-	this->drawUtils.DrawCardAtPoint(point, card, &dc);
+	int roomCardIndex = drawUtils.GetRoomCardIndexAtPoint(point);
+	if (roomCardIndex != -1 && game.room[roomCardIndex] != NULL)
+	{
+		draggingCardIndex = roomCardIndex;
+		dragX = point.x;
+		dragY = point.y;
+		CClientDC dc(this);
+		PaintInMemoryDCs();
+		BlitInMemoryDCs(&dc);
+	}
 
 	CDialog::OnLButtonDown(nFlags, point);
 }
 
 void CScoundrelDlg::OnMouseMove(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
+	if (draggingCardIndex != -1)
+	{
+		int newX = point.x / 5 * 5;
+		int newY = point.y / 5 * 5;
+		if (newX == dragX && newY == dragY)
+			return;
+
+		dragX = newX;
+		dragY = newY;
+		CClientDC dc(this);
+		BlitInMemoryDCs(&dc);
+	}
 
 	CDialog::OnMouseMove(nFlags, point);
 }
 
 void CScoundrelDlg::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
-	// TODO: Add your message handler code here and/or call default
-
+	// TODO -   - keotl 2026-04-05
 	CDialog::OnLButtonDblClk(nFlags, point);
+}
+
+void CScoundrelDlg::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	draggingCardIndex = -1;
+	CClientDC dc(this);
+	PaintInMemoryDCs();
+	BlitInMemoryDCs(&dc);
+	// TODO - trigger action based on drop-off point  - keotl 2026-04-05
+
+	CDialog::OnLButtonUp(nFlags, point);
 }

@@ -21,10 +21,14 @@ DrawUtils::DrawUtils()
 {
 }
 
-void DrawUtils::Init(CDC *dc)
+void DrawUtils::Init(CDC *dc, CRect clientRect)
 {
+	this->clientRect = clientRect;
 	this->cardSize = CSize(29, 41);
 	this->roomCardMargin = 4;
+	this->roomOrigin = clientRect.CenterPoint();
+	this->roomOrigin.Offset(-cardSize.cx * 2 - roomCardMargin * 2, 0);
+	this->roomOrigin.y = 40;
 	this->cardFont.CreateFont(12, 0,
 							  0, 0,
 							  FW_BOLD,
@@ -58,7 +62,7 @@ void DrawUtils::FlipDC180(CDC *pSrcDC, CDC *pDstDC, int width, int height)
 	}
 }
 
-void DrawUtils::DrawCardAtPoint(CPoint point, Card card, CDC *dc)
+void DrawUtils::DrawCardAtPoint(CPoint point, const Card *card, CDC *dc)
 {
 	// Prepare label+suit canvas (10px wide, 18px tall: 10 for rank + 8 for suit)
 	int canvasW = 17;
@@ -76,13 +80,13 @@ void DrawUtils::DrawCardAtPoint(CPoint point, Card card, CDC *dc)
 	cardCanvasDc.SetTextColor(RGB(0, 0, 0));
 	cardCanvasDc.SelectObject(&this->cardFont);
 	CString rankStr;
-	rankStr.Format(_T("%d"), card.rank);
+	rankStr.Format(_T("%d"), card->rank);
 	cardCanvasDc.DrawText(rankStr, labelRect, DT_CENTER);
 
 	// Draw suit next to rank
-	cardCanvasDc.BitBlt(10, 1, 7, 8, &this->suitsMemDC, 7 * card.suit, 0, SRCCOPY);
+	cardCanvasDc.BitBlt(10, 1, 7, 8, &this->suitsMemDC, 7 * card->suit, 0, SRCCOPY);
 	// Draw suit below rank
-	cardCanvasDc.BitBlt(1, 10, 7, 8, &this->suitsMemDC, 7 * card.suit, 0, SRCCOPY);
+	cardCanvasDc.BitBlt(1, 10, 7, 8, &this->suitsMemDC, 7 * card->suit, 0, SRCCOPY);
 
 	// Draw card outline
 	CPen pen(PS_SOLID, 1, RGB(0, 0, 0));
@@ -109,31 +113,37 @@ void DrawUtils::DrawCardAtPoint(CPoint point, Card card, CDC *dc)
 	dc->SelectObject(pOldBrush);
 }
 
-void DrawUtils::DrawGameState(CDC *dc, CRect clientRect, const GameState &game, int ignoringRoomCardIndex)
+void DrawUtils::DrawGameState(CDC *dc, const GameState &game, int ignoringRoomCardIndex)
 {
 
 	// Draw background
 	CBrush brush;
 	brush.CreateSolidBrush(RGB(0, 130, 0));
-	dc->FillRect(&clientRect, &brush);
+	dc->FillRect(&this->clientRect, &brush);
 
 	// Draw room
-	CPoint roomOrigin(clientRect.CenterPoint());
-	roomOrigin.Offset(-cardSize.cx * 2 - roomCardMargin * 2, 0);
-	roomOrigin.y = 40;
 
 	for (int i = 0; i < GameState::ROOM_SIZE; i++)
 	{
 		CPoint cardPos(roomOrigin);
 		cardPos.Offset((cardSize.cx + roomCardMargin) * i, 0);
 
-		if (game.room[i] != NULL)
+		if (game.room[i] != NULL && i != ignoringRoomCardIndex)
 		{
-			DrawCardAtPoint(cardPos, *game.room[i], dc);
+			DrawCardAtPoint(cardPos, game.room[i], dc);
 		}
 	}
 
 	// Draw Weapon + durability
 
 	// Draw discarded
+}
+
+int DrawUtils::GetRoomCardIndexAtPoint(const CPoint &point)
+{
+	if (point.y > roomOrigin.y + cardSize.cy || point.y < roomOrigin.y || point.x < roomOrigin.x || point.x > roomOrigin.x + (cardSize.cx + roomCardMargin) * GameState::ROOM_SIZE)
+	{
+		return -1;
+	}
+	return (point.x - roomOrigin.x) / (cardSize.cx + roomCardMargin);
 }
