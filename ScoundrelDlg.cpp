@@ -189,6 +189,7 @@ void CScoundrelDlg::OnLButtonUp(UINT nFlags, CPoint point)
 	{
 		CClientDC dc(this);
 		BOOL actionSuccessful = true;
+		int previousHealth = game.health;
 		if (drawUtils.IsPointInArmourRegion(point))
 		{
 			int error = game.Equip(draggingCardIndex);
@@ -215,7 +216,10 @@ void CScoundrelDlg::OnLButtonUp(UINT nFlags, CPoint point)
 			else
 			{
 				drawUtils.TransferForegroundCardToDurabilityRegion(&backgroundDc, &foregroundDc, game.foughtByWeapon.GetCount() - 1);
-				drawUtils.DrawHUD(&backgroundDc, game, _T("Fought with weapon!"));
+
+				CString msg;
+				msg.Format(_T( "Fought with weapon! -%d HP" ), previousHealth - game.health);
+				drawUtils.DrawHUD(&backgroundDc, game, msg);
 			}
 		}
 		else if (drawUtils.IsPointInUsePlaceholderRegion(point))
@@ -231,7 +235,9 @@ void CScoundrelDlg::OnLButtonUp(UINT nFlags, CPoint point)
 				}
 				else
 				{
-					drawUtils.DrawHUD(&backgroundDc, game, _T("Fought barehanded!"));
+					CString msg;
+					msg.Format(_T( "Fought barehanded! -%d HP" ), previousHealth - game.health);
+					drawUtils.DrawHUD(&backgroundDc, game, msg);
 				}
 			}
 			else if (card != NULL && (card->suit == HEART))
@@ -244,7 +250,9 @@ void CScoundrelDlg::OnLButtonUp(UINT nFlags, CPoint point)
 				}
 				else
 				{
-					drawUtils.DrawHUD(&backgroundDc, game, _T("Drank potion!"));
+					CString msg;
+					msg.Format(_T( "Drank potion! +%d HP" ), game.health - previousHealth);
+					drawUtils.DrawHUD(&backgroundDc, game, msg);
 				}
 			}
 			else
@@ -347,7 +355,7 @@ void CScoundrelDlg::HandleGameError(int error)
 		message = _T("Not a monster");
 		break;
 	case GAME_ERROR_EXCEED_WEAPON_DURABILITY:
-		message = _T("Weapon durability exceeded");
+		message = _T("Exceeds durability!");
 		break;
 	default:
 		message = _T("Unknown error");
