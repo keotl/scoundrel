@@ -243,7 +243,7 @@ int GameState::FightBarehanded(int cardIndexInRoom)
 		return GAME_ERROR_NOT_A_MONSTER;
 	}
 
-	health -= monster->Value();
+	health = max(0, health - monster->Value());
 	discarded.AddTail(monster);
 	room[cardIndexInRoom] = NULL;
 	return GAME_ERROR_NONE;
@@ -275,7 +275,7 @@ int GameState::FightWithWeapon(int cardIndexInRoom)
 		return GAME_ERROR_EXCEED_WEAPON_DURABILITY;
 	}
 
-	health -= max(0, monster->Value() - activeWeapon->Value());
+	health = max(0, health - max(0, monster->Value() - activeWeapon->Value()));
 	foughtByWeapon.AddTail(monster);
 	room[cardIndexInRoom] = NULL;
 	return GAME_ERROR_NONE;
@@ -348,4 +348,22 @@ int GameState::CalculateScore()
 	}
 
 	return health;
+}
+
+BOOL GameState::ShouldDraw()
+{
+	int remainingCardsInRoom = 0;
+	for (int i = 0; i < ROOM_SIZE; i++)
+	{
+		if (room[i] != NULL)
+		{
+			remainingCardsInRoom++;
+		}
+	}
+	return remainingCardsInRoom <= 1;
+}
+
+void GameState::SetCanRun()
+{
+	canRun = true;
 }

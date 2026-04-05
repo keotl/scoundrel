@@ -2,12 +2,15 @@
 //
 
 #include "Card.h"
+#include "GameState.h"
+#include "afx.h"
 #include "afxwin.h"
 #include "stdafx.h"
 #include "Scoundrel.h"
 #include "ScoundrelDlg.h"
 #include "DrawUtils.h"
 #include "wingdi.h"
+#include "winuser.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -123,12 +126,19 @@ void CScoundrelDlg::OnPaint()
 
 void CScoundrelDlg::OnLButtonDown(UINT nFlags, CPoint point)
 {
+	CClientDC dc(this);
+	drawUtils.DrawHUD(&backgroundDc, game, "");
 	if (drawUtils.IsPointInDeckRegion(point))
 	{
 		int error = game.RunAway();
 		if (error)
 		{
 			HandleGameError(error);
+		}
+		else
+		{
+			drawUtils.RepaintRoom(&backgroundDc, game, -1);
+			drawUtils.DrawHUD(&backgroundDc, game, "Ran away!");
 		}
 	}
 
@@ -142,10 +152,9 @@ void CScoundrelDlg::OnLButtonDown(UINT nFlags, CPoint point)
 		dragMouseIntrinsicOffsetX = point.x - cardRect.TopLeft().x;
 		dragMouseIntrinsicOffsetY = point.y - cardRect.TopLeft().y;
 
-		CClientDC dc(this);
 		drawUtils.TransferRoomCard(&backgroundDc, &foregroundDc, roomCardIndex);
-		BlitInMemoryDCs(&dc);
 	}
+	BlitInMemoryDCs(&dc);
 
 	CDialog::OnLButtonDown(nFlags, point);
 }
@@ -191,7 +200,8 @@ void CScoundrelDlg::OnLButtonUp(UINT nFlags, CPoint point)
 			else
 			{
 				drawUtils.TransferForegroundCardToArmourRegion(&backgroundDc, &foregroundDc);
-				drawUtils.DrawHUD(&backgroundDc, game, _T("Equiped weapon!"));
+				drawUtils.ClearDurabilityRegion(&backgroundDc);
+				drawUtils.DrawHUD(&backgroundDc, game, _T("Equipped weapon!"));
 			}
 		}
 		else if (drawUtils.IsPointInDurabilityRegion(point))
@@ -252,6 +262,46 @@ void CScoundrelDlg::OnLButtonUp(UINT nFlags, CPoint point)
 			drawUtils.RestoreRoomCardFromForeground(&backgroundDc, &foregroundDc, draggingCardIndex);
 		}
 		draggingCardIndex = -1;
+
+		if (actionSuccessful)
+		{
+
+			GameStatus status = game.GetGameStatus();
+			if (status == GAME_STATUS_LOST)
+			{
+				CString str;
+				str.Format(_T( "You lost! Score %d" ), game.CalculateScore());
+				MessageBox(str, _T("Scoundrel"), MB_OK);
+				game.InitializeNewGame();
+				Invalidate(true);
+				return;
+			}
+			else if (status == GAME_STATUS_WON)
+			{
+				CString str;
+				str.Format(_T( "You won! Score %d" ), game.CalculateScore());
+				MessageBox(str, _T("Scoundrel"), MB_OK);
+				game.InitializeNewGame();
+				Invalidate(true);
+				return;
+			}
+
+			if (game.ShouldDraw())
+			{
+				game.DrawRoom();
+				game.SetCanRun();
+				int deckSize = game.remaining.GetCount() == 0 ? 0 : 1 + game.remaining.GetCount() / 10;
+				if (deckSize != previousDeckSize)
+				{
+					previousDeckSize = deckSize;
+					drawUtils.RepaintDeck(&backgroundDc, deckSize);
+				}
+
+				// TODO - faster better incremental room repaint  - keotl 2026-04-05
+				drawUtils.RepaintRoom(&backgroundDc, game, -1);
+			}
+		}
+
 		BlitInMemoryDCs(&dc);
 	}
 
@@ -260,7 +310,8 @@ void CScoundrelDlg::OnLButtonUp(UINT nFlags, CPoint point)
 
 void CScoundrelDlg::ShowMessage(CString message)
 {
-	MessageBox(message, _T("Scoundrel"), MB_OK | MB_ICONINFORMATION);
+	// MessageBox(message, _T("Scoundrel"), MB_OK | MB_ICONINFORMATION);
+	drawUtils.DrawHUD(&backgroundDc, game, message);
 }
 
 void CScoundrelDlg::HandleGameError(int error)
@@ -278,7 +329,7 @@ void CScoundrelDlg::HandleGameError(int error)
 		message = _T("Invalid card index");
 		break;
 	case GAME_ERROR_CANNOT_RUN:
-		message = _T("Cannot run from this card");
+		message = _T("Can't escape!");
 		break;
 	case GAME_ERROR_NO_WEAPON_EQUIPPED:
 		message = _T("No weapon equipped");
@@ -302,5 +353,5 @@ void CScoundrelDlg::HandleGameError(int error)
 		message = _T("Unknown error");
 		break;
 	}
-	MessageBox(message, _T("Error"), MB_OK | MB_ICONERROR);
+	ShowMessage(message);
 }

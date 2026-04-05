@@ -62,6 +62,7 @@ class CScoundrelDlg : public CDialog
 	CDC foregroundDc; // Card being dragged around
 	CBitmap fbBitmap;
 	CDC fbDc; // Final framebuffer, to be blitted directly to client.
+	int previousDeckSize;
 
 	void PaintForegroundDC();
 	void PaintInMemoryDCs();

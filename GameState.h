@@ -47,6 +47,8 @@ class GameState
 	int DrinkPotion(int cardIndexInRoom);
 	int FightBarehanded(int cardIndexInRoom);
 	int FightWithWeapon(int cardIndexInRoom);
+	BOOL ShouldDraw();
+	void SetCanRun();
 
 	GameStatus GetGameStatus();
 	int CalculateScore();

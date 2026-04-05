@@ -59,6 +59,7 @@ void DrawUtils::Init(CDC *dc, CRect clientRect)
 	this->selectedCardBack = 0;
 	this->hudRegion = CRect(0, clientRect.BottomRight().y - 20, clientRect.BottomRight().x, clientRect.BottomRight().y);
 	this->hudColor = RGB(200, 200, 200);
+	this->roomRegion = CRect(roomOrigin, CSize((cardSize.cx + roomCardMargin) * GameState::ROOM_SIZE, cardSize.cy));
 }
 
 DrawUtils::~DrawUtils()
@@ -140,17 +141,7 @@ void DrawUtils::DrawGameState(CDC *dc, const GameState &game, int ignoringRoomCa
 	dc->FillRect(&this->clientRect, &brush);
 
 	// Draw room
-	int i;
-	for (i = 0; i < GameState::ROOM_SIZE; i++)
-	{
-		CPoint cardPos(roomOrigin);
-		cardPos.Offset((cardSize.cx + roomCardMargin) * i, 0);
-
-		if (game.room[i] != NULL && i != ignoringRoomCardIndex)
-		{
-			DrawCardAtPoint(cardPos, game.room[i], dc);
-		}
-	}
+	RepaintRoom(dc, game, ignoringRoomCardIndex);
 
 	// Draw Weapon + durability
 	if (game.activeWeapon == NULL)
@@ -174,30 +165,7 @@ void DrawUtils::DrawGameState(CDC *dc, const GameState &game, int ignoringRoomCa
 	}
 
 	// Draw deck
-	CPoint deckCardOrigin(deckOrigin);
-
-	if (game.remaining.GetCount() == 0)
-	{
-		// Empty deck placeholder
-		pen.CreatePen(PS_DASH, 1, RGB(10, 10, 10));
-		dc->SelectObject(&pen);
-		dc->SelectObject(CBrush::FromHandle((HBRUSH)GetStockObject(NULL_BRUSH)));
-		dc->Rectangle(CRect(deckOrigin, cardSize));
-		pen.DeleteObject();
-		pen.CreatePen(PS_SOLID, 3, RGB(0, 255, 0));
-		dc->SelectObject(&pen);
-		CPoint deckCenter = CRect(deckOrigin, cardSize).CenterPoint();
-		dc->Ellipse(CRect(deckCenter.x - 10, deckCenter.y - 10, deckCenter.x + 10, deckCenter.y + 10));
-		pen.DeleteObject();
-	}
-	else
-	{
-		for (i = 0; i < min(game.remaining.GetCount() / 10, 2) + 1; i++)
-		{
-			DrawCardBackAtPoint(deckCardOrigin, dc);
-			deckCardOrigin.Offset(2, 1);
-		}
-	}
+	RepaintDeck(dc, game.remaining.GetCount() == 0 ? 0 : 1 + game.remaining.GetCount() / 10);
 
 	// Draw usage placeholder
 	pen.CreatePen(PS_DASH, 1, RGB(10, 10, 10));
@@ -289,4 +257,48 @@ void DrawUtils::DrawHUD(CDC *backgroundDc, const GameState &game, CString action
 	str.Format(_T( "Health: %d" ), game.health);
 	backgroundDc->DrawText(str, healthRect, DT_LEFT);
 	backgroundDc->DrawText(actionMessage, healthRect, DT_RIGHT);
+}
+
+void DrawUtils::RepaintRoom(CDC *dc, const GameState &game, int ignoringRoomCardIndex)
+{
+	dc->FillSolidRect(&roomRegion, bgColor);
+	for (int i = 0; i < GameState::ROOM_SIZE; i++)
+	{
+		CPoint cardPos(roomOrigin);
+		cardPos.Offset((cardSize.cx + roomCardMargin) * i, 0);
+
+		if (game.room[i] != NULL && i != ignoringRoomCardIndex)
+		{
+			DrawCardAtPoint(cardPos, game.room[i], dc);
+		}
+	}
+}
+
+void DrawUtils::RepaintDeck(CDC *backgroundDc, int size)
+{
+	CPen pen;
+	backgroundDc->FillSolidRect(deckRegion, bgColor);
+	CPoint deckCardOrigin(deckOrigin);
+	if (size == 0)
+	{
+		// Empty deck placeholder
+		pen.CreatePen(PS_DASH, 1, RGB(10, 10, 10));
+		backgroundDc->SelectObject(&pen);
+		backgroundDc->SelectObject(CBrush::FromHandle((HBRUSH)GetStockObject(NULL_BRUSH)));
+		backgroundDc->Rectangle(CRect(deckOrigin, cardSize));
+		pen.DeleteObject();
+		pen.CreatePen(PS_SOLID, 3, RGB(0, 255, 0));
+		backgroundDc->SelectObject(&pen);
+		CPoint deckCenter = CRect(deckOrigin, cardSize).CenterPoint();
+		backgroundDc->Ellipse(CRect(deckCenter.x - 10, deckCenter.y - 10, deckCenter.x + 10, deckCenter.y + 10));
+		pen.DeleteObject();
+	}
+	else
+	{
+		for (int i = 0; i < min(size, 3); i++)
+		{
+			DrawCardBackAtPoint(deckCardOrigin, backgroundDc);
+			deckCardOrigin.Offset(2, 1);
+		}
+	}
 }

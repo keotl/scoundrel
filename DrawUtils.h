@@ -36,6 +36,8 @@ class DrawUtils
 	BOOL IsPointInUsePlaceholderRegion(const CPoint &point);
 	BOOL IsPointInDeckRegion(const CPoint &point);
 	void DrawHUD(CDC*backgroundDc, const GameState &game, CString actionMessage);
+	void RepaintRoom(CDC*backgroundDc, const GameState & game, int ignoringRoomCardIndex);
+	void RepaintDeck(CDC*backgroundDc, int size);
 
 	CSize cardSize;
 	CPoint roomOrigin;
@@ -64,6 +66,7 @@ class DrawUtils
 	CRect usePlaceholderRegion;
 	CRect hudRegion;
 	COLORREF hudColor;
+	CRect roomRegion;
 };
 
 #endif // !defined(AFX_DRAWUTILS_H__EACA2ACB_396D_4BA1_AAE2_2507686CDD75__INCLUDED_)
