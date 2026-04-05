@@ -222,7 +222,7 @@ int GameState::DrinkPotion(int cardIndexInRoom)
 
 	if (canDrink)
 	{
-		health += min(room[cardIndexInRoom]->Value(), MAX_HEALTH);
+		health = min(health + room[cardIndexInRoom]->Value(), MAX_HEALTH);
 	}
 
 	canDrink = false;
@@ -238,7 +238,7 @@ int GameState::FightBarehanded(int cardIndexInRoom)
 		return GAME_ERROR_INVALID_CARD_INDEX;
 	}
 	Card *monster = room[cardIndexInRoom];
-	if (monster->suit != SPADE || monster->suit != CLUB)
+	if (monster->suit != SPADE && monster->suit != CLUB)
 	{
 		return GAME_ERROR_NOT_A_MONSTER;
 	}

@@ -26,11 +26,16 @@ class DrawUtils
 	void DrawGameState(CDC *dc, const GameState &game, int ignoringRoomCardIndex);
 	int GetRoomCardIndexAtPoint(const CPoint &point);
 	void TransferRoomCard(CDC *backgroundDc, CDC *foregroundDc, int roomCardIndex);
+	void RestoreRoomCardFromForeground(CDC *backgroundDc, CDC *foregroundDc, int roomCardIndex);
+	void TransferForegroundCardToArmourRegion(CDC *backgroundDc, CDC *foregroundDc);
+	void TransferForegroundCardToDurabilityRegion(CDC *backgroundDc, CDC *foregroundDc, int indexInDurability);
+	void ClearDurabilityRegion(CDC *backgroundDc);
 	CRect GetRoomCardRect(int roomCardIndex);
 	BOOL IsPointInArmourRegion(const CPoint &point);
 	BOOL IsPointInDurabilityRegion(const CPoint &point);
 	BOOL IsPointInUsePlaceholderRegion(const CPoint &point);
 	BOOL IsPointInDeckRegion(const CPoint &point);
+	void DrawHUD(CDC*backgroundDc, const GameState &game);
 
 	CSize cardSize;
 	CPoint roomOrigin;
@@ -53,6 +58,12 @@ class DrawUtils
 	CPoint deckOrigin;
 	CPoint usePlaceholderOrigin;
 	int selectedCardBack;
+	CRect deckRegion;
+	CRect armourRegion;
+	CRect durabilityRegion;
+	CRect usePlaceholderRegion;
+	CRect hudRegion;
+	COLORREF hudColor;
 };
 
 #endif // !defined(AFX_DRAWUTILS_H__EACA2ACB_396D_4BA1_AAE2_2507686CDD75__INCLUDED_)

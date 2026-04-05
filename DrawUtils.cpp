@@ -51,7 +51,13 @@ void DrawUtils::Init(CDC *dc, CRect clientRect)
 	this->durabilityOrigin.y = armourOrigin.y;
 	this->deckOrigin = CPoint(4, roomOrigin.y);
 	this->usePlaceholderOrigin = CPoint(clientRect.Width() - 4 - cardSize.cx, roomOrigin.y);
+	this->armourRegion = CRect(armourOrigin, cardSize);
+	this->durabilityRegion = CRect(durabilityOrigin, CSize(cardSize.cx * 3, cardSize.cy));
+	this->usePlaceholderRegion = CRect(usePlaceholderOrigin, cardSize);
+	this->deckRegion = CRect(deckOrigin, CSize(cardSize.cx + 4, cardSize.cy + 3));
 	this->selectedCardBack = 0;
+	this->hudRegion = CRect(0, clientRect.BottomRight().y - 20, clientRect.BottomRight().x, clientRect.BottomRight().y);
+	this->hudColor = RGB(200,200,200);
 }
 
 DrawUtils::~DrawUtils()
@@ -156,7 +162,7 @@ void DrawUtils::DrawGameState(CDC *dc, const GameState &game, int ignoringRoomCa
 	for (POSITION pos = game.foughtByWeapon.GetHeadPosition(); pos != NULL;)
 	{
 		Card *card = game.foughtByWeapon.GetNext(pos);
-		durabilityCardPos.Offset(16, 0);
+		durabilityCardPos.Offset(8, 0);
 		DrawCardAtPoint(durabilityCardPos, card, dc);
 	}
 
@@ -192,6 +198,9 @@ void DrawUtils::DrawGameState(CDC *dc, const GameState &game, int ignoringRoomCa
 	dc->SelectObject(&pen);
 	dc->SelectObject(CBrush::FromHandle((HBRUSH)GetStockObject(NULL_BRUSH)));
 	dc->Rectangle(usagePlaceholder);
+
+	// Draw HUD
+	DrawHUD(dc, game);
 }
 
 int DrawUtils::GetRoomCardIndexAtPoint(const CPoint &point)
@@ -221,4 +230,54 @@ void DrawUtils::TransferRoomCard(CDC *backgroundDc, CDC *foregroundDc, int roomC
 void DrawUtils::DrawCardBackAtPoint(CPoint point, CDC *dc)
 {
 	dc->BitBlt(point.x, point.y, cardSize.cx, cardSize.cy, &cardBackMemDC, 0, 0, SRCCOPY);
+}
+
+BOOL DrawUtils::IsPointInDeckRegion(const CPoint &point)
+{
+	return deckRegion.TopLeft().x <= point.x && deckRegion.TopLeft().y <= point.y && point.x <= deckRegion.BottomRight().x && point.y <= deckRegion.BottomRight().y;
+}
+
+BOOL DrawUtils::IsPointInArmourRegion(const CPoint &point)
+{
+	return armourRegion.TopLeft().x <= point.x && armourRegion.TopLeft().y <= point.y && point.x <= armourRegion.BottomRight().x && point.y <= armourRegion.BottomRight().y;
+}
+
+BOOL DrawUtils::IsPointInDurabilityRegion(const CPoint &point)
+{
+	return durabilityRegion.TopLeft().x <= point.x && durabilityRegion.TopLeft().y <= point.y && point.x <= durabilityRegion.BottomRight().x && point.y <= durabilityRegion.BottomRight().y;
+}
+
+BOOL DrawUtils::IsPointInUsePlaceholderRegion(const CPoint &point)
+{
+	return usePlaceholderRegion.TopLeft().x <= point.x && usePlaceholderRegion.TopLeft().y <= point.y && point.x <= usePlaceholderRegion.BottomRight().x && point.y <= usePlaceholderRegion.BottomRight().y;
+}
+
+void DrawUtils::RestoreRoomCardFromForeground(CDC *backgroundDc, CDC *foregroundDc, int roomCardIndex)
+{
+	CRect cardRect = GetRoomCardRect(roomCardIndex);
+	backgroundDc->BitBlt(cardRect.TopLeft().x, cardRect.TopLeft().y, cardSize.cx, cardSize.cy, foregroundDc, 0, 0, SRCCOPY);
+	// backgroundDc->FillSolidRect(cardRect, bgColor);
+}
+
+void DrawUtils::TransferForegroundCardToArmourRegion(CDC *backgroundDc, CDC *foregroundDc)
+{
+	backgroundDc->BitBlt(armourOrigin.x, armourOrigin.y, cardSize.cx, cardSize.cy, foregroundDc, 0, 0, SRCCOPY);
+}
+void DrawUtils::TransferForegroundCardToDurabilityRegion(CDC *backgroundDc, CDC *foregroundDc, int indexInDurability)
+{
+	backgroundDc->BitBlt(durabilityOrigin.x + indexInDurability * 8, durabilityOrigin.y, cardSize.cx, cardSize.cy, foregroundDc, 0, 0, SRCCOPY);
+}
+
+void DrawUtils::ClearDurabilityRegion(CDC *backgroundDc)
+{
+	CRect durabilityRegion = CRect(durabilityOrigin, CSize(cardSize.cx * 3, cardSize.cy));
+	backgroundDc->FillSolidRect(durabilityRegion, darkerBgColor);
+}
+
+void DrawUtils::DrawHUD(CDC *backgroundDc, const GameState &game)
+{
+	backgroundDc->FillSolidRect(hudRegion, hudColor);
+	CString str;
+	str.Format(_T( "Health: %d" ), game.health);
+	backgroundDc->DrawText(str, hudRegion, DT_LEFT);
 }

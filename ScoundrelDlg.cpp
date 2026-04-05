@@ -123,6 +123,15 @@ void CScoundrelDlg::OnPaint()
 
 void CScoundrelDlg::OnLButtonDown(UINT nFlags, CPoint point)
 {
+	if (drawUtils.IsPointInDeckRegion(point))
+	{
+		int error = game.RunAway();
+		if (error)
+		{
+			HandleGameError(error);
+		}
+	}
+
 	int roomCardIndex = drawUtils.GetRoomCardIndexAtPoint(point);
 	if (roomCardIndex != -1 && game.room[roomCardIndex] != NULL)
 	{
@@ -167,11 +176,130 @@ void CScoundrelDlg::OnLButtonDblClk(UINT nFlags, CPoint point)
 
 void CScoundrelDlg::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	draggingCardIndex = -1;
-	CClientDC dc(this);
-	PaintInMemoryDCs();
-	BlitInMemoryDCs(&dc);
-	// TODO - trigger action based on drop-off point  - keotl 2026-04-05
+	if (draggingCardIndex != -1)
+	{
+		CClientDC dc(this);
+		BOOL actionSuccessful = true;
+		if (drawUtils.IsPointInArmourRegion(point))
+		{
+			int error = game.Equip(draggingCardIndex);
+			if (error)
+			{
+				HandleGameError(error);
+				actionSuccessful = false;
+			}
+			else
+			{
+				drawUtils.TransferForegroundCardToArmourRegion(&backgroundDc, &foregroundDc);
+			}
+		}
+		else if (drawUtils.IsPointInDurabilityRegion(point))
+		{
+			int error = game.FightWithWeapon(draggingCardIndex);
+			if (error)
+			{
+				HandleGameError(error);
+				actionSuccessful = false;
+			}
+			else
+			{
+				drawUtils.TransferForegroundCardToDurabilityRegion(&backgroundDc, &foregroundDc, game.foughtByWeapon.GetCount() - 1);
+				drawUtils.DrawHUD(&backgroundDc, game);
+			}
+		}
+		else if (drawUtils.IsPointInUsePlaceholderRegion(point))
+		{
+			Card *card = game.room[draggingCardIndex];
+			if (card != NULL && (card->suit == SPADE || card->suit == CLUB))
+			{
+				int error = game.FightBarehanded(draggingCardIndex);
+				if (error)
+				{
+					HandleGameError(error);
+					actionSuccessful = false;
+				}
+				else
+				{
+					drawUtils.DrawHUD(&backgroundDc, game);
+				}
+			}
+			else if (card != NULL && (card->suit == HEART))
+			{
+				int error = game.DrinkPotion(draggingCardIndex);
+				if (error)
+				{
+					HandleGameError(error);
+					actionSuccessful = false;
+				}
+				else
+				{
+					drawUtils.DrawHUD(&backgroundDc, game);
+				}
+			}
+			else
+			{
+				actionSuccessful = false;
+			}
+		}
+		else
+		{
+			actionSuccessful = false;
+		}
+
+		if (!actionSuccessful)
+		{
+			drawUtils.RestoreRoomCardFromForeground(&backgroundDc, &foregroundDc, draggingCardIndex);
+		}
+		draggingCardIndex = -1;
+		BlitInMemoryDCs(&dc);
+	}
 
 	CDialog::OnLButtonUp(nFlags, point);
+}
+
+void CScoundrelDlg::ShowMessage(CString message)
+{
+	MessageBox(message, _T("Scoundrel"), MB_OK | MB_ICONINFORMATION);
+}
+
+void CScoundrelDlg::HandleGameError(int error)
+{
+	CString message;
+	switch (error)
+	{
+	case GAME_ERROR_NONE:
+		message = _T("No error");
+		break;
+	case GAME_ERROR_INVALID_ROOM_SIZE:
+		message = _T("Invalid room size");
+		break;
+	case GAME_ERROR_INVALID_CARD_INDEX:
+		message = _T("Invalid card index");
+		break;
+	case GAME_ERROR_CANNOT_RUN:
+		message = _T("Cannot run from this card");
+		break;
+	case GAME_ERROR_NO_WEAPON_EQUIPPED:
+		message = _T("No weapon equipped");
+		break;
+	case GAME_ERROR_NO_ROOM_CARD:
+		message = _T("No room card at index");
+		break;
+	case GAME_ERROR_NOT_A_WEAPON:
+		message = _T("Not a weapon");
+		break;
+	case GAME_ERROR_NOT_A_POTION:
+		message = _T("Not a potion");
+		break;
+	case GAME_ERROR_NOT_A_MONSTER:
+		message = _T("Not a monster");
+		break;
+	case GAME_ERROR_EXCEED_WEAPON_DURABILITY:
+		message = _T("Weapon durability exceeded");
+		break;
+	default:
+		message = _T("Unknown error");
+		break;
+	}
+	MessageBox(message, _T("Error"), MB_OK | MB_ICONERROR);
 }

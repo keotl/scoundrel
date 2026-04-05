@@ -66,6 +66,8 @@ class CScoundrelDlg : public CDialog
 	void PaintForegroundDC();
 	void PaintInMemoryDCs();
 	void BlitInMemoryDCs(CDC *pDC);
+	void ShowMessage(CString message);
+	void HandleGameError(int error);
 };
 
 //{{AFX_INSERT_LOCATION}}
