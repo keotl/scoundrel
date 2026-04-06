@@ -385,7 +385,9 @@ SOURCE=.\DrawUtils.cpp
 !IF  "$(CFG)" == "Scoundrel - Win32 (WCE MIPS) Release"
 
 DEP_CPP_DRAWU=\
+	".\Card.h"\
 	".\DrawUtils.h"\
+	".\GameState.h"\
 	".\Scoundrel.h"\
 	".\StdAfx.h"\
 	
@@ -395,6 +397,7 @@ DEP_CPP_DRAWU=\
 DEP_CPP_DRAWU=\
 	".\Card.h"\
 	".\DrawUtils.h"\
+	".\GameState.h"\
 	".\Scoundrel.h"\
 	".\StdAfx.h"\
 	
@@ -536,6 +539,9 @@ SOURCE=.\Scoundrel.cpp
 !IF  "$(CFG)" == "Scoundrel - Win32 (WCE MIPS) Release"
 
 DEP_CPP_SCOUN=\
+	".\Card.h"\
+	".\DrawUtils.h"\
+	".\GameState.h"\
 	".\Scoundrel.h"\
 	".\ScoundrelDlg.h"\
 	".\StdAfx.h"\
@@ -546,6 +552,7 @@ DEP_CPP_SCOUN=\
 DEP_CPP_SCOUN=\
 	".\Card.h"\
 	".\DrawUtils.h"\
+	".\GameState.h"\
 	".\Scoundrel.h"\
 	".\ScoundrelDlg.h"\
 	".\StdAfx.h"\
@@ -632,7 +639,9 @@ SOURCE=.\ScoundrelDlg.cpp
 !IF  "$(CFG)" == "Scoundrel - Win32 (WCE MIPS) Release"
 
 DEP_CPP_SCOUND=\
+	".\Card.h"\
 	".\DrawUtils.h"\
+	".\GameState.h"\
 	".\Scoundrel.h"\
 	".\ScoundrelDlg.h"\
 	".\StdAfx.h"\
@@ -643,6 +652,7 @@ DEP_CPP_SCOUND=\
 DEP_CPP_SCOUND=\
 	".\Card.h"\
 	".\DrawUtils.h"\
+	".\GameState.h"\
 	".\Scoundrel.h"\
 	".\ScoundrelDlg.h"\
 	".\StdAfx.h"\
@@ -802,6 +812,10 @@ SOURCE=.\StdAfx.h
 # Begin Group "Resource Files"
 
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+# Begin Source File
+
+SOURCE=.\backs.BMP
+# End Source File
 # Begin Source File
 
 SOURCE=.\res\Scoundrel.ico

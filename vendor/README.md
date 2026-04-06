@@ -1,9 +1,4 @@
-# Vendor Dependencies
-
-This directory contains Windows CE SDK and eMbedded Visual C++ include files
-needed to build the Scoundrel project. These files are not checked into git.
-
-## Directory Structure
+# Directory Structure
 
 ```
 vendor/

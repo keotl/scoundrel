@@ -29,6 +29,7 @@ CScoundrelDlg::CScoundrelDlg(CWnd *pParent /*=NULL*/)
 	//}}AFX_DATA_INIT
 	// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	m_hIconSmall = AfxGetApp()->LoadIcon(IDI_ICON1);
 }
 
 void CScoundrelDlg::DoDataExchange(CDataExchange *pDX)
@@ -59,7 +60,7 @@ BOOL CScoundrelDlg::OnInitDialog()
 	// Set the icon for this dialog.  The framework does this automatically
 	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);	 // Set big icon
-	SetIcon(m_hIcon, FALSE); // Set small icon
+	SetIcon(m_hIconSmall, FALSE); // Set small icon
 
 	CenterWindow(GetDesktopWindow()); // center to the hpc screen
 

@@ -37,6 +37,7 @@ class CScoundrelDlg : public CDialog
 	// Implementation
   protected:
 	HICON m_hIcon;
+	HICON m_hIconSmall;
 
 	// Generated message map functions
 	//{{AFX_MSG(CScoundrelDlg)

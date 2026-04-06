@@ -1,71 +1,34 @@
 # Development Setup
+Here is my workflow, feel free to take some inspiration.
 
-## Prerequisites
+## Software dependencies
 
-- A Windows XP machine with **Microsoft eMbedded Visual C++ 3.0** installed (used for building)
-- A Linux machine with **clangd** (v18+) and **Emacs** with eglot (used for editing)
-- SMB share between the two machines
+Make sure to install:
+1. Microsoft ActiveSync (Optional, for connecting to a pocket PC).
+2. Microsoft eMbedded Visual Tools 3.0 (MSDN disc X11-49895)
+3. Microsoft Pocket PC SDK (MSDN disc X11-26157)
 
-## Repository layout
+## Include files in vendor/
+Copy WinCE and Microsoft eMbedded Tools to vendor/ to get clangd code
+completions and diagnostics.
 
-```
-├── Microsoft eMbedded Tools/   # eMbedded Visual C++ IDE files (from install)
-├── wce-sdk/                    # Windows CE SDK headers and libs (see below)
-│   └── wce300/
-│       ├── MS Pocket PC/       # Pocket PC SDK
-│       ├── Pocket PC 2002/
-│       └── Smartphone 2002/
-└── Scoundrel/                  # Project source code
-```
-
-## Setting up the Windows CE SDK headers
-
-The `wce-sdk/` directory must contain the contents of `C:\Windows CE Tools` (or `C:\Program Files\Windows CE Tools`) from the Windows XP build machine. These are installed by the Pocket PC SDKs alongside eMbedded Visual C++.
-
-Copy the entire directory:
-
-```
-C:\Windows CE Tools\  →  wce-sdk/
-```
-
-The critical paths for clangd are:
-
-- `wce-sdk/wce300/MS Pocket PC/include` — Windows CE platform headers (windows.h, wingdi.h, etc.)
-- `wce-sdk/wce300/MS Pocket PC/mfc/include` — MFC headers (afxwin.h, afxext.h, etc.)
-- `wce-sdk/wce300/MS Pocket PC/atl/include` — ATL headers
-
-## clangd setup
-
-The `Scoundrel/compile_flags.txt` configures clangd with the correct include paths and preprocessor defines. No additional setup is needed — clangd picks it up automatically.
-
-**Case sensitivity note:** The source files use lowercase `#include "stdafx.h"` but the original filenames are `StdAfx.h`/`StdAfx.cpp`. On Linux, rename them to match the include directives:
-
+## Sync scripts
+See example scripts for which files to include/exclude.
 ```bash
-cd Scoundrel
-mv StdAfx.h stdafx.h
-mv StdAfx.cpp stdafx.cpp
+./push.sh
+./pull.sh
 ```
 
-## Emacs
-
-`.dir-locals.el` and `.clang-format` in `Scoundrel/` configure:
-
-- CRLF line endings (required for the Windows CE compiler)
-- Tab indentation (4-wide)
-- Microsoft brace style
-- MFC macro preservation in clang-format
-
-## Syncing with the build machine
-
-The Windows XP build machine is accessed via SMB. From the `Scoundrel/` directory:
-
-```bash
-./push.sh   # sync local → build machine
-./pull.sh   # sync build machine → local
-```
-
-These scripts exclude workspace-only files (.git, .clang-format, compile_flags.txt, etc.) from the sync.
+## Editor config
+Make sure to set-up
+1. CRLF line endings.
+2. Microsoft brace style & MFC macro preservation in clang-format.
 
 ## Building
 
 Open `Scoundrel.vcw` in eMbedded Visual C++ on the Windows XP machine and build from there. The project targets WCE 3.0 (MIPS, ARM, x86).
+
+
+## Debugging
+If eMbedded Visual C++ stalls on build when trying to copy to the
+device, try having Remote Spy open first.
